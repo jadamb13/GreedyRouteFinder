@@ -1,7 +1,5 @@
 import csv
 
-from ChainHashTable import ChainHashTable
-
 
 class Package:
 
@@ -19,7 +17,7 @@ class Package:
         return "%s, %s, %s, %s, %s, %s, %s" % (
             self.package_id, self.address, self.city, self.state, self.zipcode, self.deadline, self.weight)
 
-    def load_package_data(filename):
+    def load_package_data(filename, my_hash):
         with open(filename) as package_file:
             package_data = csv.reader(package_file, delimiter=',')
 
@@ -34,16 +32,10 @@ class Package:
 
                 # Package object
                 p = Package(p_id, p_address, p_city, p_state, p_zipcode, p_deadline, p_weight)
-                #print(p)
-                # Hash table instance
-                my_hash = ChainHashTable()
+                # print(p)
 
                 # insert it into the hash table
                 my_hash.insert(p_id, p)
 
 
-        print("Packages from Hashtable:")
-        # Fetch data from Hash Table
-        for i in range(len(my_hash.table) + 1):
-            print("Key: {} and PackageObj: {}".format(i + 1, my_hash.search(i + 1)))  # 1 to 11 is sent to
-            # myHash.search()
+
