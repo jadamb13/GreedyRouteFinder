@@ -46,7 +46,7 @@ class Package:
 
         with open(filename) as distance_file:
             distance_table = csv.reader(distance_file, delimiter=',')
-            count = 0
+
             for row in distance_table:
                 addresses.append(row[1].strip().replace('\n', ' '))
                 for i in range(0, len(addresses)-1):

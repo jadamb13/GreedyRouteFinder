@@ -1,6 +1,6 @@
 # Ref: zyBooks - Figure 7.8.2: Hash table using chaining.
 
-class ChainHashTable:
+class ChainingHashTable:
     # Constructor with optional initial capacity parameter
     # Assigns all buckets with an empty list
     def __init__(self, initial_capacity=10):
