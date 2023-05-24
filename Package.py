@@ -38,10 +38,20 @@ class Package:
                 my_hash.insert(p_id, p)
 
     def load_distance_data(filename):
+
+        addresses = []
+        distances = []
+        for i in range(0, 27):
+            distances.append([])
+
         with open(filename) as distance_file:
-            distance_data = csv.reader(distance_file, delimiter=',')
+            distance_table = csv.reader(distance_file, delimiter=',')
+            count = 0
+            for row in distance_table:
+                addresses.append(row[1].strip().replace('\n', ' '))
+                for i in range(0, len(addresses)-1):
+                    distances[len(addresses)-1].append(row[2 + i])
+            print(addresses)
 
-            for item in distance_data:
-                print(item[0])
-
-
+        for row in distances:
+            print(row)
