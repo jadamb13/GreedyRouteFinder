@@ -37,5 +37,11 @@ class Package:
                 # insert it into the hash table
                 my_hash.insert(p_id, p)
 
+    def load_distance_data(filename):
+        with open(filename) as distance_file:
+            distance_data = csv.reader(distance_file, delimiter=',')
+
+            for item in distance_data:
+                print(item[0])
 
 
