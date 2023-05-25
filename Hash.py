@@ -3,7 +3,7 @@
 class ChainingHashTable:
     # Constructor with optional initial capacity parameter
     # Assigns all buckets with an empty list
-    def __init__(self, initial_capacity=10):
+    def __init__(self, initial_capacity=40):
         # initialize the hash table with empty bucket list entries.
         self.table = []
         for i in range(initial_capacity):
@@ -30,8 +30,10 @@ class ChainingHashTable:
     # Returns the item if found, or None if not found
     def search(self, key):
         # get the bucket list where this key would be
+        #print(key)
         bucket = hash(key) % len(self.table)
         bucket_list = self.table[bucket]
+        #print(bucket_list)
 
         # search for the key in the bucket list
         for key_value in bucket_list:

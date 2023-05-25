@@ -32,10 +32,11 @@ class Package:
 
                 # Package object
                 p = Package(p_id, p_address, p_city, p_state, p_zipcode, p_deadline, p_weight)
-                # print(p)
+                #print(p)
 
                 # insert it into the hash table
                 my_hash.insert(p_id, p)
+
 
     def load_distance_data(filename):
 
@@ -51,7 +52,4 @@ class Package:
                 addresses.append(row[1].strip().replace('\n', ' '))
                 for i in range(0, len(addresses)-1):
                     distances[len(addresses)-1].append(row[2 + i])
-            print(addresses)
 
-        for row in distances:
-            print(row)
