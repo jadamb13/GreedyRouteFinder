@@ -17,39 +17,45 @@ class Package:
         return "%s, %s, %s, %s, %s, %s, %s" % (
             self.package_id, self.address, self.city, self.state, self.zipcode, self.deadline, self.weight)
 
-    def load_package_data(filename, my_hash):
-        with open(filename) as package_file:
-            package_data = csv.reader(package_file, delimiter=',')
 
-            for package in package_data:
-                p_id = package[0]
-                p_address = package[1]
-                p_city = package[2]
-                p_state = package[3]
-                p_zipcode = package[4]
-                p_deadline = package[5]
-                p_weight = package[6]
+def load_distance_data(filename):
+    addresses = []
+    distances = []
+    for i in range(0, 27):
+        distances.append([])
 
-                # Package object
-                p = Package(p_id, p_address, p_city, p_state, p_zipcode, p_deadline, p_weight)
-                #print(p)
+    with open(filename) as distance_file:
+        distance_table = csv.reader(distance_file, delimiter=',')
 
-                # insert it into the hash table
-                my_hash.insert(p_id, p)
+        for row in distance_table:
+            addresses.append(row[1].strip().replace('\n', ' '))
+            for i in range(0, len(addresses) - 1):
+                distances[len(addresses) - 1].append(row[2 + i])
+
+    print()
+    for row in distances:
+        print(addresses[distances.index(row)], end=" : ")
+        for col in row:
+            print(col, end=" ")
+        print()
 
 
-    def load_distance_data(filename):
+def load_package_data(filename, my_hash):
+    with open(filename) as package_file:
+        package_data = csv.reader(package_file, delimiter=',')
 
-        addresses = []
-        distances = []
-        for i in range(0, 27):
-            distances.append([])
+        for package in package_data:
+            p_id = int(package[0])
+            p_address = package[1]
+            p_city = package[2]
+            p_state = package[3]
+            p_zipcode = package[4]
+            p_deadline = package[5]
+            p_weight = package[6]
 
-        with open(filename) as distance_file:
-            distance_table = csv.reader(distance_file, delimiter=',')
+            # Package object
+            p = Package(p_id, p_address, p_city, p_state, p_zipcode, p_deadline, p_weight)
+            # print(p)
 
-            for row in distance_table:
-                addresses.append(row[1].strip().replace('\n', ' '))
-                for i in range(0, len(addresses)-1):
-                    distances[len(addresses)-1].append(row[2 + i])
-
+            # insert it into the hash table
+            my_hash.insert(p_id, p)

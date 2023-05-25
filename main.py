@@ -7,14 +7,8 @@ def get_package_data():
 
     # Fetch data from Hash Table
     for i in range(0, 40):
-        #print("Key: {} Package info: {}".format(i+1, my_hash.search(str(i+1)))) # 1 to 11 is sent to my_hash.search()
-        print(my_hash.search(str(i)))
-    """
-    for kv in my_hash.table:
-        for k, v in kv:
-            print("Key: " + k + " | Package object: " + str(v))
-    print()
-"""
+        print("Key: {} Package info: {}".format(i+1, my_hash.search(i+1))) # 1 to 11 is sent to my_hash.search()
+
 
 if __name__ == '__main__':
     print()
@@ -24,14 +18,12 @@ if __name__ == '__main__':
     my_hash = ChainingHashTable()
 
     # Load packages to Hash Table
-    Package.load_package_data('package_data.csv', my_hash)
+    load_package_data(my_hash)
 
     # print("Packages from Hashtable:")
     get_package_data()
 
     # Load address and distance data into lists
-    Package.load_distance_data('distances.csv')
-    #for index in my_hash.table:
-    #    print(index)
+    load_distance_data()
 
-    #print(my_hash.search('6'))
+
