@@ -12,12 +12,17 @@ class Package:
         self.zipcode = zipcode
         self.deadline = deadline
         self.weight = weight
+        self.status = "At hub"
 
     def __str__(self):  # overwrite print(Package), otherwise it will print object reference
-        return "%s, %s, %s, %s, %s, %s, %s" % (
-            self.package_id, self.address, self.city, self.state, self.zipcode, self.deadline, self.weight)
+        return "%s, %s, %s, %s, %s, %s, %s, %s" % (
+            self.package_id, self.address, self.city, self.state, self.zipcode, self.deadline, self.weight, self.status)
 
+    def get_status(self):
+        return self.status
 
+    def set_status(self, status):
+        self.status = status
 
     def load_distance_data(filename):
         addresses = []

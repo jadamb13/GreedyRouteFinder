@@ -2,15 +2,14 @@ from Hash import ChainingHashTable
 from Package import *
 from Truck import *
 
-def get_package_data():
 
+def get_package_data():
     # Fetch data from Hash Table
     for i in range(0, 40):
-        print("Key: {} Package info: {}".format(i+1, my_hash.search(i+1)))
+        print("Key: {} Package info: {}".format(i + 1, my_hash.search(i + 1)))
 
 
 def load_trucks(t1, t2, t3):
-
     t1.packages.append(my_hash.search(13))
     t1.packages.append(my_hash.search(14))
     t1.packages.append(my_hash.search(15))
@@ -54,10 +53,9 @@ def load_trucks(t1, t2, t3):
     t3.packages.append(my_hash.search(31))
     t3.packages.append(my_hash.search(35))
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     print()
-    # CLI or GUI logic
 
     # Hash table instance
     my_hash = ChainingHashTable()
@@ -80,11 +78,17 @@ if __name__ == '__main__':
 
     # Show truck package lists [Testing]
     for package in truck1.get_packages():
-        print(package)
-    print()
+        package.set_status("En route")
+        # print(package)
+    # print()
     for package in truck2.get_packages():
-        print(package)
-    print()
-    for package in truck3.get_packages():
-        print(package)
-    print()
+        package.set_status("En route")
+        # print(package)
+    # print()
+    # for package in truck3.get_packages():
+        # print(package)
+    # print()
+
+
+
+   # CLI or GUI logic
