@@ -30,7 +30,6 @@ class ChainingHashTable:
     # Returns the item if found, or None if not found
     def search(self, key):
         # get the bucket list where this key would be
-        #print(key)
         bucket = hash(key) % len(self.table)
         bucket_list = self.table[bucket]
 
