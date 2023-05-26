@@ -89,6 +89,11 @@ if __name__ == '__main__':
         # print(package)
     # print()
 
-
+    # TODO: 1. Implement nearest neighbor/greedy algorithm to decide best delivery routes for trucks
+    # TODO: 2. Code return value for load_distance_data() to return addresses/distances for routing algorithm
+    # TODO: 3. Keep track of mileage (When address visited, add mileage to total mileage for that truck/
+    #  add totals once last package delivered
+    # TODO: 4. Keep track of delivery times (When address visited, set delivery time of package)
+    # TODO: 5. Decide on GUI or CLI and implement
 
    # CLI or GUI logic

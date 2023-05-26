@@ -13,10 +13,11 @@ class Package:
         self.deadline = deadline
         self.weight = weight
         self.status = "At hub"
+        self.delivery_time = "N/A"
 
     def __str__(self):  # overwrite print(Package), otherwise it will print object reference
-        return "%s, %s, %s, %s, %s, %s, %s, %s" % (
-            self.package_id, self.address, self.city, self.state, self.zipcode, self.deadline, self.weight, self.status)
+        return "%s, %s, %s, %s, %s, %s, %s, %s, %s" % (
+            self.package_id, self.address, self.city, self.state, self.zipcode, self.deadline, self.weight, self.status, self.delivery_time)
 
     def get_status(self):
         return self.status
