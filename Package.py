@@ -20,6 +20,9 @@ class Package:
             self.package_id, self.address, self.city, self.state, self.zipcode, self.deadline, self.weight, self.status,
             self.delivery_time)
 
+    def get_address(self):
+        return self.address
+
     def get_status(self):
         return self.status
 
@@ -36,28 +39,27 @@ class Package:
         with open(filename) as distance_file:
             distance_table = csv.reader(distance_file, delimiter=',')
 
+            # No address is listed in the second column for the first row
+            # Separates first row to pull address from first column
+            row0 = next(distance_table)
+            # Turn address into single line, split into tokens, extract token for street address
+            addresses.append(row0[0].split('\n')[1].replace('\n', ' ').replace(',', ''))
+
+            # For all other rows, extract address from second column
             for row in distance_table:
-                addresses.append(row[1].strip().replace('\n', ' '))
+                # Turn address into single line, split into tokens, extract token for street address
+                addresses.append(row[1].split('\n')[0].strip().replace('\n', ' '))
                 for i in range(0, len(addresses) - 1):
                     distances[len(addresses) - 1].append(float(row[2 + i]))
 
-        # Save addresses and distances into dictionary -> key: address, values: dictionary of distances dictionary of
-        # distances -> key: 0-26 corresponding to address, value: distance value to corresponding address
+        # Save addresses and distances into dictionary
+        # key: address | values: list of distances to other addresses
         distances_dict = {}
         keys = [a for a in addresses]
         for key in keys:
             distances_dict[key] = [x for x in distances[keys.index(key)]]
 
         return distances_dict
-
-    """
-        print()
-        for row in distances:
-            print(addresses[distances.index(row)], end=" : ")
-            for col in row:
-                print(col, end=" ")
-            print()
-    """
 
     def load_package_data(filename, my_hash):
         with open(filename) as package_file:
