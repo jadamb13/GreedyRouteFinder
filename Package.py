@@ -17,7 +17,8 @@ class Package:
 
     def __str__(self):  # overwrite print(Package), otherwise it will print object reference
         return "%s, %s, %s, %s, %s, %s, %s, %s, %s" % (
-            self.package_id, self.address, self.city, self.state, self.zipcode, self.deadline, self.weight, self.status, self.delivery_time)
+            self.package_id, self.address, self.city, self.state, self.zipcode, self.deadline, self.weight, self.status,
+            self.delivery_time)
 
     def get_status(self):
         return self.status
@@ -28,6 +29,7 @@ class Package:
     def load_distance_data(filename):
         addresses = []
         distances = []
+
         for i in range(0, 27):
             distances.append([])
 
@@ -37,7 +39,16 @@ class Package:
             for row in distance_table:
                 addresses.append(row[1].strip().replace('\n', ' '))
                 for i in range(0, len(addresses) - 1):
-                    distances[len(addresses) - 1].append(row[2 + i])
+                    distances[len(addresses) - 1].append(float(row[2 + i]))
+
+        # Save addresses and distances into dictionary -> key: address, values: dictionary of distances dictionary of
+        # distances -> key: 0-26 corresponding to address, value: distance value to corresponding address
+        distances_dict = {}
+        keys = [a for a in addresses]
+        for key in keys:
+            distances_dict[key] = [x for x in distances[keys.index(key)]]
+
+        return distances_dict
 
     """
         print()
@@ -67,5 +78,3 @@ class Package:
 
                 # insert it into the hash table
                 my_hash.insert(p_id, p)
-
-

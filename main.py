@@ -67,7 +67,7 @@ if __name__ == '__main__':
     # get_package_data()
 
     # Load address and distance data into lists
-    Package.load_distance_data('distances.csv')
+    print(Package.load_distance_data('distances.csv'))
 
     # Create truck objects and load them
     truck1 = Truck()
@@ -90,7 +90,6 @@ if __name__ == '__main__':
     # print()
 
     # TODO: 1. Implement nearest neighbor/greedy algorithm to decide best delivery routes for trucks
-    # TODO: 2. Code return value for load_distance_data() to return addresses/distances for routing algorithm
     # TODO: 3. Keep track of mileage (When address visited, add mileage to total mileage for that truck/
     #  add totals once last package delivered
     # TODO: 4. Keep track of delivery times (When address visited, set delivery time of package)
