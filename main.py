@@ -25,6 +25,18 @@ def find_nearest_address(current_address, truck, distance_data):
         nearest_address = addresses_to_check[address_distances.index(min(address_distances))]
         # print(nearest_address)
 
+        """
+        print("Addresses in dict:")
+        for i in distance_data:
+            print(i)
+
+        print()
+        print("Addresses to check:")
+        for i in addresses_to_check:
+            print(i)
+        """
+        # print(next_address_choices)
+
         # Add mileage to truck for distance to travel to nearest_address
         truck.set_mileage(truck.get_mileage() + min(address_distances))
         # print(truck.get_mileage())
@@ -32,37 +44,36 @@ def find_nearest_address(current_address, truck, distance_data):
         # Ratio of total miles traveled in an hour to miles traveled to nearest address
         mileage_ratio = 18 / min(address_distances)
         minutes_to_add = 60 / mileage_ratio
-        seconds_to_add = (minutes_to_add - int(minutes_to_add)) * 60
 
         # Update time based on 18mph and distance to next address
-
         time_object = datetime.strptime(start_time, '%I:%M:%S').time()
-
-        # Adapted from: https://bobbyhadz.com/blog/python-add-minutes-to-datetime
+        # datetime.combine() and timedelta() adapted from: https://bobbyhadz.com/blog/python-add-minutes-to-datetime
         new_time = (datetime.combine(date.today(), time_object) + timedelta(seconds=minutes_to_add * 60)).time()
+
+        # Convert time object into string
         time_delivered = new_time.strftime("%H:%M:%S")
 
+        for i in truck.get_packages():
+            if i.get_address() == nearest_address:
+                i.set_status("Delivered")
+                i.set_delivery_time(time_delivered)
+        for i in truck.get_packages():
+            print(i.get_status())
+            print(i.get_delivery_time())
+
         # Update delivery_time and status of package at next address
 
+        # Find package being delivered
+
+                # Set package.delivery_time = time_delivered
+                # Set package.status = "Delivered"
 
         # For all remaining packages where package.get_status() isn't "Delivered" (until no more packages to deliver)
-        # find next address with minimum distance from current address
-        # Add mileage to travel to next address
-        # Update time based on 18mph and distance to next address
-        # Update delivery_time and status of package at next address
+            # find next address with minimum distance from current address
+            # Add mileage to travel to next address
+            # Update time based on 18mph and distance to next address
+            # Update delivery_time and status of package at next address
 
-        """
-        print("Addresses in dict:")
-        for i in distance_data:
-            print(i)
-            
-        print()
-        print("Addresses to check:")
-        for i in addresses_to_check:
-            print(i)
-"""
-
-        # print(next_address_choices)
 
 
 def load_trucks(t1, t2, t3):
@@ -131,7 +142,6 @@ if __name__ == '__main__':
 
     # Load address and distance data into lists
     distance_data = Package.load_distance_data('distances.csv')
-    find_nearest_address('4001 South 700 East', truck1, distance_data)
 
     # Show truck package lists [Testing]
     for package in truck1.get_packages():
@@ -145,6 +155,11 @@ if __name__ == '__main__':
     # for package in truck3.get_packages():
     # print(package)
     # print()
+
+    # Find best routes for trucks
+    find_nearest_address('4001 South 700 East', truck1, distance_data)
+
+
 
     # TODO: 1. Implement nearest neighbor/greedy algorithm to decide best delivery routes for trucks
     # TODO: 3. Keep track of mileage (When address visited, add mileage to total mileage for that truck/
