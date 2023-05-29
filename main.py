@@ -21,13 +21,11 @@ def find_nearest_address(current_address, truck, distance_data):
         addresses_to_check = [x.get_address() for x in truck.get_packages()]
         for i in addresses_to_check:
             address_distances.append(distance_data[i][0])
-        # print(address_distances)
+
         nearest_address = addresses_to_check[address_distances.index(min(address_distances))]
-        # print(nearest_address)
 
         # Add mileage to truck for distance to travel to nearest_address
         truck.set_mileage(truck.get_mileage() + min(address_distances))
-        # print(truck.get_mileage())
 
         # Ratio of total miles traveled in an hour to miles traveled to nearest address
         mileage_ratio = 18 / min(address_distances)
@@ -54,50 +52,59 @@ def find_nearest_address(current_address, truck, distance_data):
     else:
         # Starting from location other than hub
         addresses_to_check.clear()
-        address_distances.clear()
+        addresses_to_check = [x.get_address() for x in truck.get_packages() if x.get_status() != "Delivered"]
         starting_address = truck.get_location()
         # For all remaining packages where package.get_status() isn't "Delivered" (until no more packages to deliver)
-        addresses_to_check = [x.get_address() for x in truck.get_packages() if x.get_status() != "Delivered"]
-        # print(list(distance_data))
-        # print()
-        #print(list(distance_data))
-        # print(distance_data[starting_address])
-        for address in addresses_to_check:
-            # print(distance_data[address])
-            if not list(distance_data).index(address) > len(distance_data[starting_address]):
-                address_distances.append(distance_data[truck.get_location()][list(distance_data).index(address)])
+
+        while len(addresses_to_check) > 0:
+            starting_address = truck.get_location()
+            addresses_to_check = [x.get_address() for x in truck.get_packages() if x.get_status() != "Delivered"]
+            address_distances.clear()
+            print(len(addresses_to_check))
+            print()
+            for address in addresses_to_check:
+                if not list(distance_data).index(address) > len(distance_data[starting_address]):
+                    address_distances.append(distance_data[truck.get_location()][list(distance_data).index(address)])
+                else:
+                    address_distances.append(distance_data[address][list(distance_data).index(starting_address)])
+
+            print(address_distances)
+
+            if len(address_distances) > 0:
+                nearest_address = addresses_to_check[address_distances.index(min(address_distances))]
+
+                # Add mileage to travel to nearest address
+                truck.set_mileage(truck.get_mileage() + min(address_distances))
+
+                # Ratio of total miles traveled in an hour to miles traveled to nearest address
+                mileage_ratio = 18 / min(address_distances)
+                minutes_to_add = 60 / mileage_ratio
             else:
-                address_distances.append(distance_data[address][list(distance_data).index(starting_address)])
-        print(address_distances)
-        nearest_address = addresses_to_check[address_distances.index(min(address_distances))]
+                # Calculate distance/time to get back to hub
 
-        # Add mileage to travel to neartest address
-        truck.set_mileage(truck.get_mileage() + min(address_distances))
 
-        # Ratio of total miles traveled in an hour to miles traveled to nearest address
-        mileage_ratio = 18 / min(address_distances)
-        minutes_to_add = 60 / mileage_ratio
+            # Create datetime time object from start time string
+            time_object = datetime.strptime(truck.get_last_delivered_package_time(), '%I:%M:%S').time()
 
-        # Create datetime time object from start time string
-        time_object = datetime.strptime(truck.get_last_delivered_package_time(), '%I:%M:%S').time()
+            # Use time_object and timedelta to create new_time object to represent delivery time
+            # datetime.combine() and timedelta() adapted from: https://bobbyhadz.com/blog/python-add-minutes-to-datetime
+            new_time = (datetime.combine(date.today(), time_object) + timedelta(seconds=minutes_to_add * 60)).time()
 
-        # Use time_object and timedelta to create new_time object to represent delivery time
-        # datetime.combine() and timedelta() adapted from: https://bobbyhadz.com/blog/python-add-minutes-to-datetime
-        new_time = (datetime.combine(date.today(), time_object) + timedelta(seconds=minutes_to_add * 60)).time()
+            # Convert new_time time object into string to store in Package attribute -> delivery_time
+            time_delivered = new_time.strftime("%H:%M:%S")
 
-        # Convert new_time time object into string to store in Package attribute -> delivery_time
-        time_delivered = new_time.strftime("%H:%M:%S")
-
-        # Find package associated with nearest address
-        for i in truck.get_packages():
-            if i.get_address() == nearest_address:
-                # Update delivery_time, status of package, and truck's last delivery time
-                i.set_status("Delivered")
-                i.set_delivery_time(time_delivered)
-                truck.set_last_delivered_package_time(time_delivered)
-                truck.set_location(nearest_address)
-        for package in truck.get_packages():
-            print(package)
+            # Find package associated with nearest address
+            for i in truck.get_packages():
+                if i.get_address() == nearest_address:
+                    # Update delivery_time, status of package, and truck's last delivery time
+                    i.set_status("Delivered")
+                    i.set_delivery_time(time_delivered)
+                    truck.set_last_delivered_package_time(time_delivered)
+                    truck.set_location(nearest_address)
+            for package in truck.get_packages():
+                print(package)
+            print()
+            print(truck.get_mileage())
 
 def load_trucks(t1, t2, t3):
     t1.packages.append(my_hash.search(13))
