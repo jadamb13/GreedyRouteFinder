@@ -21,14 +21,17 @@ def find_nearest_address(truck, distance_data):
         # Set start times for trucks
         if truck.get_truck_id() == 3:
             start_time = "10:10:00"
-        else:
+        if truck.get_truck_id() == 1:
             start_time = "08:00:00"
-        print(truck.get_packages())
+        if truck.get_truck_id() == 2:
+            start_time = "09:10:00"
+
         # Populate list with addresses for all packages on truck
         addresses_to_check = [x.get_address() for x in truck.get_packages()]
 
         for i in addresses_to_check:
             address_distances.append(distance_data[i][0])
+
 
         if truck.get_truck_id() == 1:
             first_address = "3595 Main St"
@@ -42,8 +45,8 @@ def find_nearest_address(truck, distance_data):
         # print("Random start index: " + str(random_start_index))
         first_address = addresses_to_check[random_start_index]
         '''
-
         print(first_address)
+
         # Add mileage to truck for distance to travel to nearest_address
         # truck.set_mileage(truck.get_mileage() + min(address_distances))
         mileage_to_first_address = address_distances[addresses_to_check.index(first_address)]
@@ -191,7 +194,6 @@ def load_trucks(t1, t2, t3):
     t3.packages.append(my_hash.search(31))
     t3.packages.append(my_hash.search(35))
 
-
 if __name__ == '__main__':
     print()
 
@@ -230,7 +232,7 @@ if __name__ == '__main__':
 
     # Find best routes for trucks
     # find_nearest_address('4001 South 700 East', truck1, distance_data)
-    find_nearest_address(truck3, distance_data)
+    find_nearest_address(truck1, distance_data)
 
 
     total_mileage = round((truck1.get_mileage() + truck2.get_mileage() + truck3.get_mileage()), 2)
@@ -243,6 +245,6 @@ if __name__ == '__main__':
     # CLI or GUI logic
 
     # TODO: 1. Check code to make sure packages with deadlines delivered on time
-    # TODO: 2. Change code to simplify calls to find_nearest_address [different for first address from hub and second+]
+    # TODO: 2. (Opt.) Create function to determine which address to choose first from hub to reduce overall mileage
     # TODO: 3. Reduce duplicated code -> move to functions
     # TODO: 4. Decide on GUI or CLI and implement
