@@ -4,6 +4,7 @@ class Truck:
         self.mileage = 0
         self.last_delivered_package_time = "08:00"
         self.location = ""
+        self.end_route_time = "N/A"
 
     def get_packages(self):
         return self.packages
@@ -25,3 +26,9 @@ class Truck:
 
     def set_location(self, location):
         self.location = location
+
+    def set_end_route_time(self, time):
+        self.end_route_time = time
+
+    def get_end_route_time(self):
+        return self.end_route_time

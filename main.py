@@ -17,7 +17,10 @@ def find_nearest_address(current_address, truck, distance_data):
     address_distances = []
     # If starting address is the hub, find the closest address from all packages on truck
     if current_address == '4001 South 700 East':
-        start_time = "08:00:00"
+        if len(truck.get_packages()) < 15:
+            start_time = "10:10:00"
+        else:
+            start_time = "08:00:00"
         addresses_to_check = [x.get_address() for x in truck.get_packages()]
         for i in addresses_to_check:
             address_distances.append(distance_data[i][0])
@@ -49,26 +52,23 @@ def find_nearest_address(current_address, truck, distance_data):
                 i.set_delivery_time(time_delivered)
                 truck.set_last_delivered_package_time(time_delivered)
                 truck.set_location(nearest_address)
+
     else:
         # Starting from location other than hub
         addresses_to_check.clear()
         addresses_to_check = [x.get_address() for x in truck.get_packages() if x.get_status() != "Delivered"]
-        starting_address = truck.get_location()
+
         # For all remaining packages where package.get_status() isn't "Delivered" (until no more packages to deliver)
 
         while len(addresses_to_check) > 0:
             starting_address = truck.get_location()
             addresses_to_check = [x.get_address() for x in truck.get_packages() if x.get_status() != "Delivered"]
             address_distances.clear()
-            print(len(addresses_to_check))
-            print()
             for address in addresses_to_check:
                 if not list(distance_data).index(address) > len(distance_data[starting_address]):
                     address_distances.append(distance_data[truck.get_location()][list(distance_data).index(address)])
                 else:
                     address_distances.append(distance_data[address][list(distance_data).index(starting_address)])
-
-            print(address_distances)
 
             if len(address_distances) > 0:
                 nearest_address = addresses_to_check[address_distances.index(min(address_distances))]
@@ -79,19 +79,36 @@ def find_nearest_address(current_address, truck, distance_data):
                 # Ratio of total miles traveled in an hour to miles traveled to nearest address
                 mileage_ratio = 18 / min(address_distances)
                 minutes_to_add = 60 / mileage_ratio
+
+                # Create datetime time object from start time string
+                time_object = datetime.strptime(truck.get_last_delivered_package_time(), '%I:%M:%S').time()
+
+                # Use time_object and timedelta to create new_time object to represent delivery time
+                # datetime.combine() and timedelta() adapted from:
+                # https://bobbyhadz.com/blog/python-add-minutes-to-datetime
+                new_time = (datetime.combine(date.today(), time_object) + timedelta(seconds=minutes_to_add * 60)).time()
+
+                # Convert new_time time object into string to store in Package attribute -> delivery_time
+                time_delivered = new_time.strftime("%H:%M:%S")
+
             else:
                 # Calculate distance/time to get back to hub
+                truck.set_mileage(truck.get_mileage() + distance_data[starting_address][0])
 
+                mileage_ratio = 18 / distance_data[starting_address][0]
+                minutes_to_add = 60 / mileage_ratio
 
-            # Create datetime time object from start time string
-            time_object = datetime.strptime(truck.get_last_delivered_package_time(), '%I:%M:%S').time()
+                # Create datetime time object from start time string
+                time_object = datetime.strptime(truck.get_last_delivered_package_time(), '%I:%M:%S').time()
 
-            # Use time_object and timedelta to create new_time object to represent delivery time
-            # datetime.combine() and timedelta() adapted from: https://bobbyhadz.com/blog/python-add-minutes-to-datetime
-            new_time = (datetime.combine(date.today(), time_object) + timedelta(seconds=minutes_to_add * 60)).time()
+                # Use time_object and timedelta to create new_time object to represent delivery time
+                # datetime.combine() and timedelta() adapted from:
+                # https://bobbyhadz.com/blog/python-add-minutes-to-datetime
+                new_time = (datetime.combine(date.today(), time_object) + timedelta(seconds=minutes_to_add * 60)).time()
 
-            # Convert new_time time object into string to store in Package attribute -> delivery_time
-            time_delivered = new_time.strftime("%H:%M:%S")
+                # Convert new_time time object into string to store in Package attribute -> delivery_time
+                truck.set_end_route_time(new_time.strftime("%H:%M:%S"))
+
 
             # Find package associated with nearest address
             for i in truck.get_packages():
@@ -101,10 +118,14 @@ def find_nearest_address(current_address, truck, distance_data):
                     i.set_delivery_time(time_delivered)
                     truck.set_last_delivered_package_time(time_delivered)
                     truck.set_location(nearest_address)
-            for package in truck.get_packages():
-                print(package)
-            print()
-            print(truck.get_mileage())
+            if len(addresses_to_check) == 0:
+                for package in truck.get_packages():
+                    print(package)
+                print()
+                end_route_mileage = round((truck.get_mileage()), 2)
+                print("End route mileage: " + str(end_route_mileage))
+                print("Truck end of route time: " + truck.get_end_route_time())
+                print()
 
 def load_trucks(t1, t2, t3):
     t1.packages.append(my_hash.search(13))
@@ -186,7 +207,15 @@ if __name__ == '__main__':
     # Find best routes for trucks
     find_nearest_address('4001 South 700 East', truck1, distance_data)
     find_nearest_address('4300 S 1300 E', truck1, distance_data)
-    find_nearest_address('4580 S 2300 E', truck1, distance_data)
+
+    find_nearest_address('4001 South 700 East', truck2, distance_data)
+    find_nearest_address('2530 S 500 E', truck2, distance_data)
+
+    find_nearest_address('4001 South 700 East', truck3, distance_data)
+    find_nearest_address('5383 S 900 East #104', truck3, distance_data)
+
+    total_mileage = round((truck1.get_mileage() + truck2.get_mileage() + truck3.get_mileage()), 2)
+    print("Total mileage: " + str(total_mileage))
 
     # print("Packages from Hashtable:")
     # get_package_data()
