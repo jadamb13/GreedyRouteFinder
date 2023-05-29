@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, date
+from random import randrange
 from time import strftime
 
 from Hash import ChainingHashTable
@@ -12,26 +13,45 @@ def get_package_data():
         print("Key: {} Package info: {}".format(i + 1, my_hash.search(i + 1)))
 
 
-def find_nearest_address(current_address, truck, distance_data):
-    addresses_to_check = []
+def find_nearest_address(truck, distance_data):
     address_distances = []
-    # If starting address is the hub, find the closest address from all packages on truck
-    if current_address == '4001 South 700 East':
-        if len(truck.get_packages()) < 15:
+
+    while True:
+
+        # Set start times for trucks
+        if truck.get_truck_id() == 3:
             start_time = "10:10:00"
         else:
             start_time = "08:00:00"
+        print(truck.get_packages())
+        # Populate list with addresses for all packages on truck
         addresses_to_check = [x.get_address() for x in truck.get_packages()]
+
         for i in addresses_to_check:
             address_distances.append(distance_data[i][0])
 
-        nearest_address = addresses_to_check[address_distances.index(min(address_distances))]
+        if truck.get_truck_id() == 1:
+            first_address = "3595 Main St"
+        if truck.get_truck_id() == 2:
+            first_address = "3148 S 1100 W"
+        if truck.get_truck_id() == 3:
+            first_address = "2835 Main St"
+        '''
+        # nearest_address = addresses_to_check[address_distances.index(min(address_distances))]
+        random_start_index = randrange(1, len(addresses_to_check) - 1)
+        # print("Random start index: " + str(random_start_index))
+        first_address = addresses_to_check[random_start_index]
+        '''
 
+        print(first_address)
         # Add mileage to truck for distance to travel to nearest_address
-        truck.set_mileage(truck.get_mileage() + min(address_distances))
+        # truck.set_mileage(truck.get_mileage() + min(address_distances))
+        mileage_to_first_address = address_distances[addresses_to_check.index(first_address)]
+        truck.set_mileage(truck.get_mileage() + mileage_to_first_address)
 
         # Ratio of total miles traveled in an hour to miles traveled to nearest address
-        mileage_ratio = 18 / min(address_distances)
+        # mileage_ratio = 18 / min(address_distances)
+        mileage_ratio = 18 / mileage_to_first_address
         minutes_to_add = 60 / mileage_ratio
 
         # Create datetime time object from start time string
@@ -43,85 +63,88 @@ def find_nearest_address(current_address, truck, distance_data):
         new_time = (datetime.combine(date.today(), time_object) + timedelta(seconds=minutes_to_add * 60)).time()
 
         # Convert new_time time object into string to store in Package attribute -> delivery_time
-        time_delivered = new_time.strftime("%H:%M:%S")
+        time_delivered = new_time.strftime("%I:%M:%S")
 
-        # Find package associated with the nearest address
-        for i in truck.get_packages():
-            if i.get_address() == nearest_address:
-                # Update delivery_time, status of package, and truck's last delivery time
-                i.set_status("Delivered")
-                i.set_delivery_time(time_delivered)
-                truck.set_last_delivered_package_time(time_delivered)
-                truck.set_location(nearest_address)
+        break
 
-    # Starting from location other than hub
-    else:
-        addresses_to_check.clear()
+    # Find package associated with the first address
+    for i in truck.get_packages():
+        # If first_address matches package address:
+        # set package status and delivery time
+        # set truck's location to first_address and set truck's last_delivery_time
+        if i.get_address() == first_address:
+            # Update delivery_time, status of package, and truck's last delivery time
+            i.set_status("Delivered")
+            i.set_delivery_time(time_delivered)
+            truck.set_last_delivered_package_time(time_delivered)
+            truck.set_location(first_address)
+
+    addresses_to_check.remove(first_address)
+
+    # For all remaining packages where package.get_status() isn't "Delivered" (until no more packages to deliver)
+    while len(addresses_to_check) > 0:
+        starting_address = truck.get_location()
         addresses_to_check = [x.get_address() for x in truck.get_packages() if x.get_status() != "Delivered"]
+        address_distances.clear()
 
-        # For all remaining packages where package.get_status() isn't "Delivered" (until no more packages to deliver)
-        while len(addresses_to_check) > 0:
-            starting_address = truck.get_location()
-            addresses_to_check = [x.get_address() for x in truck.get_packages() if x.get_status() != "Delivered"]
-            address_distances.clear()
-            for address in addresses_to_check:
-                if not list(distance_data).index(address) > len(distance_data[starting_address]):
-                    address_distances.append(distance_data[truck.get_location()][list(distance_data).index(address)])
-                else:
-                    address_distances.append(distance_data[address][list(distance_data).index(starting_address)])
-
-            if len(address_distances) > 0:
-                nearest_address = addresses_to_check[address_distances.index(min(address_distances))]
-
-                # Add mileage to travel to the nearest address
-                truck.set_mileage(truck.get_mileage() + min(address_distances))
-
-                # Ratio of total miles traveled in an hour to miles traveled to nearest address
-                mileage_ratio = 18 / min(address_distances)
-                minutes_to_add = 60 / mileage_ratio
-
-                # Create datetime time object from start time string
-                time_object = datetime.strptime(truck.get_last_delivered_package_time(), '%I:%M:%S').time()
-
-                # Use time_object and timedelta to create new_time object to represent delivery time
-                new_time = (datetime.combine(date.today(), time_object) + timedelta(seconds=minutes_to_add * 60)).time()
-
-                # Convert new_time time object into string to store in Package attribute -> delivery_time
-                time_delivered = new_time.strftime("%H:%M:%S")
-
+        # For each address to check, append distance from starting_address to address
+        for address in addresses_to_check:
+            if not list(distance_data).index(address) > len(distance_data[starting_address]):
+                address_distances.append(distance_data[starting_address][list(distance_data).index(address)])
             else:
-                # Calculate distance/time to get back to hub
-                truck.set_mileage(truck.get_mileage() + distance_data[starting_address][0])
+                address_distances.append(distance_data[address][list(distance_data).index(starting_address)])
 
-                # Ratio of total miles traveled in an hour to miles traveled to nearest address
-                mileage_ratio = 18 / distance_data[starting_address][0]
-                minutes_to_add = 60 / mileage_ratio
+        if len(address_distances) > 0:
 
-                # Create datetime time object from start time string
-                time_object = datetime.strptime(truck.get_last_delivered_package_time(), '%I:%M:%S').time()
+            nearest_address = addresses_to_check[address_distances.index(min(address_distances))]
 
-                # Use time_object and timedelta to create new_time object to represent delivery time
-                new_time = (datetime.combine(date.today(), time_object) + timedelta(seconds=minutes_to_add * 60)).time()
+            # Add mileage to travel to the nearest address
+            truck.set_mileage(truck.get_mileage() + min(address_distances))
 
-                # Convert new_time time object into string to store in Package attribute -> delivery_time
-                truck.set_end_route_time(new_time.strftime("%H:%M:%S"))
+            # Ratio of total miles traveled in an hour to miles traveled to nearest address
+            mileage_ratio = 18 / min(address_distances)
+            minutes_to_add = 60 / mileage_ratio
+
+            # Create datetime time object from start time string
+            time_object = datetime.strptime(truck.get_last_delivered_package_time(), '%I:%M:%S').time()
+            # Use time_object and timedelta to create new_time object to represent delivery time
+            new_time = (datetime.combine(date.today(), time_object) + timedelta(seconds=minutes_to_add * 60)).time()
+            # Convert new_time time object into string to store in Package attribute -> delivery_time
+            time_delivered = new_time.strftime("%I:%M:%S")
 
             # Find package associated with nearest address
             for i in truck.get_packages():
                 if i.get_address() == nearest_address:
-                    # Update delivery_time, status of package, and truck's last delivery time
+                    # Update truck's location and last delivery time
+                    truck.set_location(nearest_address)
+                    truck.set_last_delivered_package_time(time_delivered)
+                    # Update status/delivery_time of package(s) delivered
                     i.set_status("Delivered")
                     i.set_delivery_time(time_delivered)
-                    truck.set_last_delivered_package_time(time_delivered)
-                    truck.set_location(nearest_address)
-            if len(addresses_to_check) == 0:
-                for p in truck.get_packages():
-                    print(p)
-                print()
-                end_route_mileage = round((truck.get_mileage()), 2)
-                print("End route mileage: " + str(end_route_mileage))
-                print("Truck end of route time: " + truck.get_end_route_time())
-                print()
+
+        else:
+            starting_address = truck.get_location()
+            # Calculate distance/time to get back to hub
+            truck.set_mileage(truck.get_mileage() + distance_data[starting_address][0])
+
+            # Ratio of total miles traveled in an hour to miles traveled to nearest address
+            mileage_ratio = 18 / distance_data[starting_address][0]
+            minutes_to_add = 60 / mileage_ratio
+
+            # Create datetime time object from start time string
+            time_object = datetime.strptime(truck.get_last_delivered_package_time(), '%I:%M:%S').time()
+            # Use time_object and timedelta to create new_time object to represent delivery time
+            new_time = (datetime.combine(date.today(), time_object) + timedelta(seconds=minutes_to_add * 60)).time()
+            # Convert new_time time object into string to store in Package attribute -> delivery_time
+            truck.set_end_route_time(new_time.strftime("%H:%M:%S"))
+
+    print()
+    end_route_mileage = round((truck.get_mileage()), 2)
+    print("End route mileage: " + str(end_route_mileage))
+    print("Truck end of route time: " + truck.get_end_route_time())
+    print()
+    for p in truck.get_packages():
+        print(p)
 
 
 def load_trucks(t1, t2, t3):
@@ -179,35 +202,36 @@ if __name__ == '__main__':
     Package.load_package_data('package_data.csv', my_hash)
 
     # Create truck objects and load them
-    truck1 = Truck()
-    truck2 = Truck()
-    truck3 = Truck()
+    truck1 = Truck(1)
+    truck2 = Truck(2)
+    truck3 = Truck(3)
     load_trucks(truck1, truck2, truck3)
 
     # Load address and distance data from csv file into lists
     distance_data = Package.load_distance_data('distances.csv')
 
-    # Find best routes for trucks
-    find_nearest_address('4001 South 700 East', truck1, distance_data)
-    find_nearest_address('4300 S 1300 E', truck1, distance_data)
-
     # Set package status after leaving hub
     for package in truck1.get_packages():
-        package.set_status("In route")
+        package.set_status("En route")
 
-    find_nearest_address('4001 South 700 East', truck2, distance_data)
-    find_nearest_address('2530 S 500 E', truck2, distance_data)
+    # find_nearest_address('4001 South 700 East', truck2, distance_data)
+    # find_nearest_address('2530 S 500 E', truck2, distance_data)
 
     # Set package status after leaving hub
     for package in truck2.get_packages():
-        package.set_status("In route")
+        package.set_status("En route")
 
-    find_nearest_address('4001 South 700 East', truck3, distance_data)
-    find_nearest_address('5383 S 900 East #104', truck3, distance_data)
+    # find_nearest_address('4001 South 700 East', truck3, distance_data)
+    # find_nearest_address('5383 S 900 East #104', truck3, distance_data)
 
     # Set package status after leaving hub
     for package in truck3.get_packages():
         package.set_status("In route")
+
+    # Find best routes for trucks
+    # find_nearest_address('4001 South 700 East', truck1, distance_data)
+    find_nearest_address(truck3, distance_data)
+
 
     total_mileage = round((truck1.get_mileage() + truck2.get_mileage() + truck3.get_mileage()), 2)
     print("Total mileage: " + str(total_mileage))

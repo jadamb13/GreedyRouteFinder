@@ -1,10 +1,17 @@
 class Truck:
-    def __init__(self):
+    def __init__(self, id):
+        self.id = id
         self.packages = []
         self.mileage = 0
         self.last_delivered_package_time = "08:00"
         self.location = ""
         self.end_route_time = "N/A"
+
+    def get_truck_id(self):
+        return self.id
+
+    def set_truck_id(self, id):
+        self.id = id
 
     def get_packages(self):
         return self.packages
