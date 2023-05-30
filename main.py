@@ -22,13 +22,13 @@ def find_nearest_address(truck, distance_data):
         # Set start times and first address to visit for trucks
         if truck.get_truck_id() == 1:
             start_time = "08:00:00"
-            # first_address = "3595 Main St"
+            first_address = "4580 S 2300 E"
         if truck.get_truck_id() == 2:
             start_time = "09:10:00"
-            # first_address = "3148 S 1100 W"
+            first_address = "5383 S 900 East #104"
         if truck.get_truck_id() == 3:
-            start_time = "10:10:00"
-            # first_address = "2835 Main St"
+            start_time = "10:18:00"
+            first_address = "2530 S 500 E"
 
         # Populate list with addresses for all packages on truck
         addresses_to_check = [x.get_address() for x in truck.get_packages()]
@@ -37,11 +37,11 @@ def find_nearest_address(truck, distance_data):
 
 
         # nearest_address = addresses_to_check[address_distances.index(min(address_distances))]
-        random_start_index = randrange(1, len(addresses_to_check) - 1)
+        #random_start_index = randrange(1, len(addresses_to_check) - 1)
         # print("Random start index: " + str(random_start_index))
-        first_address = addresses_to_check[random_start_index]
+        #first_address = addresses_to_check[random_start_index]
 
-        # print(first_address)
+        print("First address: " + first_address)
 
         # Add mileage to truck for distance to travel to nearest_address
         # truck.set_mileage(truck.get_mileage() + min(address_distances))
@@ -204,8 +204,8 @@ def find_nearest_address(truck, distance_data):
     print("End route mileage: " + str(end_route_mileage))
     print("Truck end of route time: " + truck.get_end_route_time())
     print()
-    # for p in truck.get_packages():
-    #    print(p)
+    #for p in truck.get_packages():
+        #print(p)
 
 
 
@@ -217,7 +217,6 @@ def load_trucks(t1, t2, t3):
     t1.packages.append(my_hash.search(15))
     t1.packages.append(my_hash.search(20))
     t1.packages.append(my_hash.search(21))
-    t1.packages.append(my_hash.search(25))
     t1.packages.append(my_hash.search(26))
     t1.packages.append(my_hash.search(34))
     t1.packages.append(my_hash.search(28))
@@ -240,8 +239,8 @@ def load_trucks(t1, t2, t3):
     t2.packages.append(my_hash.search(30))
     t2.packages.append(my_hash.search(12))
     t2.packages.append(my_hash.search(17))
-    t2.packages.append(my_hash.search(22))
-    t2.packages.append(my_hash.search(23))
+    t2.packages.append(my_hash.search(25))
+    t2.packages.append(my_hash.search(29))
 
     t3.packages.append(my_hash.search(27))
     t3.packages.append(my_hash.search(35))
@@ -250,7 +249,8 @@ def load_trucks(t1, t2, t3):
     t3.packages.append(my_hash.search(2))
     t3.packages.append(my_hash.search(33))
     t3.packages.append(my_hash.search(7))
-    t3.packages.append(my_hash.search(29))
+    t3.packages.append(my_hash.search(23))
+    t3.packages.append(my_hash.search(22))
 
 
 if __name__ == '__main__':
@@ -291,14 +291,19 @@ if __name__ == '__main__':
 
     # Find best routes for trucks
     # find_nearest_address('4001 South 700 East', truck1, distance_data)
+    find_nearest_address(truck1, distance_data)
+    find_nearest_address(truck2, distance_data)
     find_nearest_address(truck3, distance_data)
 
-    total_mileage = round((truck1.get_mileage() + truck2.get_mileage() + truck3.get_mileage()), 2)
-    # print("Total mileage: " + str(total_mileage))
+    total_mileage = truck1.get_mileage() + truck2.get_mileage() + truck3.get_mileage()
+    print(total_mileage)
+    #total_mileage = round((truck1.get_mileage() + truck2.get_mileage() + truck3.get_mileage()), 2)
+
+    print("Total mileage: " + str(total_mileage))
 
     # print("Packages from Hashtable:")
     print()
-    # get_package_data()
+    get_package_data()
 
     # CLI or GUI logic
 
