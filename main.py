@@ -13,7 +13,7 @@ def get_package_data():
         print("Key: {} Package info: {}".format(i + 1, my_hash.search(i + 1)))
 
 
-def find_nearest_address(truck, distance_data):
+def find_route(truck, distance_data):
     address_distances = []
 
     # Logic for delivering first package
@@ -35,13 +35,12 @@ def find_nearest_address(truck, distance_data):
         for i in addresses_to_check:
             address_distances.append(distance_data[i][0])
 
-
+        # Randomly select first address to start [TESTING]
         # nearest_address = addresses_to_check[address_distances.index(min(address_distances))]
         #random_start_index = randrange(1, len(addresses_to_check) - 1)
         # print("Random start index: " + str(random_start_index))
         #first_address = addresses_to_check[random_start_index]
 
-        print("First address: " + first_address)
 
         # Add mileage to truck for distance to travel to nearest_address
         # truck.set_mileage(truck.get_mileage() + min(address_distances))
@@ -78,35 +77,34 @@ def find_nearest_address(truck, distance_data):
             truck.set_last_delivered_package_time(time_delivered)
             truck.set_location(first_address)
     addresses_to_check.remove(first_address)
-
+    package_nine_address = "410 S State St"
     # Logic for delivering packages with deadlines first
-
     addresses_with_deadlines = [x.get_address() for x in truck.get_packages()
                                 if x.get_deadline() != "EOD"
                                 and x.get_status() != "Delivered"
                                 and x.get_package_id() != 9]
-    package_nine_address = "410 S State St"
 
 
     while len(addresses_with_deadlines) > 0:
         address_distances.clear()
         starting_address = truck.get_location()
-        time = truck.get_last_delivered_package_time()
-        ten_twenty = "10:20:00"
+
         # Create datetime time object from start time string
+        time = truck.get_last_delivered_package_time()
         current_time_object = datetime.strptime(time, '%I:%M:%S').time()
+
+        # Create datetime time object for 10:20:00
+        ten_twenty = "10:20:00"
         ten_twenty_time_object = datetime.strptime(ten_twenty, '%I:%M:%S').time()
 
+        # Compare time to 10:20:00 and append package # 9 address if >= 10:20:00
         if(current_time_object >= ten_twenty_time_object):
             addresses_with_deadlines.append(package_nine_address)
 
-        # print("Starting time : " + time)
         addresses_with_deadlines = [x.get_address() for x in truck.get_packages()
                                     if x.get_deadline() != "EOD"
                                     and x.get_status() != "Delivered"]
 
-        # print(addresses_with_deadlines)
-        # print()
         # For each address to check, append distance from starting_address to address
         for address in addresses_with_deadlines:
             if not list(distance_data).index(address) > len(distance_data[starting_address]):
@@ -116,6 +114,7 @@ def find_nearest_address(truck, distance_data):
         if len(address_distances) > 0:
 
             nearest_address = addresses_with_deadlines[address_distances.index(min(address_distances))]
+
             # Add mileage to travel to the nearest address
             truck.set_mileage(truck.get_mileage() + min(address_distances))
 
@@ -136,23 +135,14 @@ def find_nearest_address(truck, distance_data):
                 if i.get_package_id() == 9:
                     i.set_address(package_nine_address)
                 if i.get_address() == nearest_address:
+
                     # Update truck's location and last delivery time
                     truck.set_location(nearest_address)
-                    # print("Nearest address selected: " + truck.get_location())
-                    # print()
                     truck.set_last_delivered_package_time(time_delivered)
-                    # print("Truck last delivered package time: " + truck.get_last_delivered_package_time())
-                    # print()
+
                     # Update status/delivery_time of package(s) delivered
                     i.set_status("Delivered")
                     i.set_delivery_time(time_delivered)
-
-    # print(addresses_with_deadlines)
-    print()
-    #for pkg in truck.get_packages():
-    #    print(pkg)
-
-
 
     # Logic for all remaining packages where package.get_status() isn't "Delivered" (until no more packages to deliver)
     while len(addresses_to_check) > 0:
@@ -180,23 +170,28 @@ def find_nearest_address(truck, distance_data):
 
             # Create datetime time object from start time string
             time_object = datetime.strptime(truck.get_last_delivered_package_time(), '%I:%M:%S').time()
+
             # Use time_object and timedelta to create new_time object to represent delivery time
             new_time = (datetime.combine(date.today(), time_object) + timedelta(seconds=minutes_to_add * 60)).time()
+
             # Convert new_time time object into string to store in Package attribute -> delivery_time
             time_delivered = new_time.strftime("%I:%M:%S")
 
             # Find package associated with nearest address
             for i in truck.get_packages():
                 if i.get_address() == nearest_address:
+
                     # Update truck's location and last delivery time
                     truck.set_location(nearest_address)
                     truck.set_last_delivered_package_time(time_delivered)
+
                     # Update status/delivery_time of package(s) delivered
                     i.set_status("Delivered")
                     i.set_delivery_time(time_delivered)
 
         else:
             starting_address = truck.get_location()
+
             # Calculate distance/time to get back to hub
             truck.set_mileage(truck.get_mileage() + distance_data[starting_address][0])
 
@@ -206,21 +201,17 @@ def find_nearest_address(truck, distance_data):
 
             # Create datetime time object from start time string
             time_object = datetime.strptime(truck.get_last_delivered_package_time(), '%I:%M:%S').time()
+
             # Use time_object and timedelta to create new_time object to represent delivery time
             new_time = (datetime.combine(date.today(), time_object) + timedelta(seconds=minutes_to_add * 60)).time()
+
             # Convert new_time time object into string to store in Package attribute -> delivery_time
             truck.set_end_route_time(new_time.strftime("%H:%M:%S"))
 
-
-
-    print()
     end_route_mileage = round((truck.get_mileage()), 2)
     print("End route mileage: " + str(end_route_mileage))
-    print("Truck end of route time: " + truck.get_end_route_time())
+    print("Truck " + str(truck.get_truck_id()) + " end of route time: " + truck.get_end_route_time())
     print()
-    #for p in truck.get_packages():
-       # print(p)
-
 
 
 def load_trucks(t1, t2, t3):
@@ -303,17 +294,15 @@ if __name__ == '__main__':
     for package in truck3.get_packages():
         package.set_status("In route")
 
-    # Find best routes for trucks
-    # find_nearest_address('4001 South 700 East', truck1, distance_data)
-    find_nearest_address(truck1, distance_data)
-    find_nearest_address(truck2, distance_data)
-    find_nearest_address(truck3, distance_data)
+    # Find routes for trucks
+    find_route(truck1, distance_data)
+    find_route(truck2, distance_data)
+    find_route(truck3, distance_data)
 
     total_mileage = truck1.get_mileage() + truck2.get_mileage() + truck3.get_mileage()
-    print(total_mileage)
-    #total_mileage = round((truck1.get_mileage() + truck2.get_mileage() + truck3.get_mileage()), 2)
+    total_mileage_rounded = round(total_mileage, 2)
 
-    print("Total mileage: " + str(total_mileage))
+    print("Total mileage: " + str(total_mileage_rounded))
 
     # print("Packages from Hashtable:")
     print()
@@ -321,7 +310,6 @@ if __name__ == '__main__':
 
     # CLI or GUI logic
 
-    # TODO: 1. Check code to make sure packages with deadlines delivered on time
-    # TODO: 2. (Opt.) Create function to determine which address to choose first from hub to reduce overall mileage
-    # TODO: 3. Reduce duplicated code -> move to functions
-    # TODO: 4. Decide on GUI or CLI and implement
+    # TODO: 1. Reduce duplicated code -> move to functions
+    # TODO: 2. Separate out find_nearest_address/nearest_neighbor from find_route()
+    # TODO: 3. Decide on GUI or CLI and implement
