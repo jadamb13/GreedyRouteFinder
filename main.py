@@ -1,8 +1,7 @@
 from datetime import datetime, timedelta, date
 
-from helper import calculate_arrival_time, deliver_package, calculate_distances_between_addresses
+from helper import calculate_arrival_time, deliver_package, calculate_distances_between_addresses, load_package_data, load_distance_data
 from Hash import ChainingHashTable
-from Package import *
 from Truck import *
 
 
@@ -149,6 +148,7 @@ def find_route(truck, distance_data):
     print()
     """
 
+
 def load_trucks(t1, t2, t3):
     t1.packages.append(my_hash.search(14))
     t1.packages.append(my_hash.search(16))
@@ -201,7 +201,7 @@ if __name__ == '__main__':
     my_hash = ChainingHashTable()
 
     # Load packages to Hash Table
-    Package.load_package_data('package_data.csv', my_hash)
+    load_package_data('package_data.csv', my_hash)
 
     # Create truck objects and load them
     truck1 = Truck(1)
@@ -210,7 +210,7 @@ if __name__ == '__main__':
     load_trucks(truck1, truck2, truck3)
 
     # Load address and distance data from csv file into lists
-    distance_data = Package.load_distance_data('distances.csv')
+    distance_data = load_distance_data('distances.csv')
 
     # Find routes for trucks
     find_route(truck1, distance_data)
