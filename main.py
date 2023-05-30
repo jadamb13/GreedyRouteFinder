@@ -24,7 +24,7 @@ def find_nearest_address(truck, distance_data):
             start_time = "08:00:00"
             first_address = "4580 S 2300 E"
         if truck.get_truck_id() == 2:
-            start_time = "09:10:00"
+            start_time = "09:15:00"
             first_address = "5383 S 900 East #104"
         if truck.get_truck_id() == 3:
             start_time = "10:18:00"
@@ -83,16 +83,28 @@ def find_nearest_address(truck, distance_data):
 
     addresses_with_deadlines = [x.get_address() for x in truck.get_packages()
                                 if x.get_deadline() != "EOD"
-                                and x.get_status() != "Delivered"]
+                                and x.get_status() != "Delivered"
+                                and x.get_package_id() != 9]
+    package_nine_address = "410 S State St"
+
 
     while len(addresses_with_deadlines) > 0:
         address_distances.clear()
         starting_address = truck.get_location()
         time = truck.get_last_delivered_package_time()
+        ten_twenty = "10:20:00"
+        # Create datetime time object from start time string
+        current_time_object = datetime.strptime(time, '%I:%M:%S').time()
+        ten_twenty_time_object = datetime.strptime(ten_twenty, '%I:%M:%S').time()
+
+        if(current_time_object >= ten_twenty_time_object):
+            addresses_with_deadlines.append(package_nine_address)
+
         # print("Starting time : " + time)
         addresses_with_deadlines = [x.get_address() for x in truck.get_packages()
                                     if x.get_deadline() != "EOD"
                                     and x.get_status() != "Delivered"]
+
         # print(addresses_with_deadlines)
         # print()
         # For each address to check, append distance from starting_address to address
@@ -121,6 +133,8 @@ def find_nearest_address(truck, distance_data):
 
             # Deliver package associated with nearest address
             for i in truck.get_packages():
+                if i.get_package_id() == 9:
+                    i.set_address(package_nine_address)
                 if i.get_address() == nearest_address:
                     # Update truck's location and last delivery time
                     truck.set_location(nearest_address)
@@ -205,7 +219,7 @@ def find_nearest_address(truck, distance_data):
     print("Truck end of route time: " + truck.get_end_route_time())
     print()
     #for p in truck.get_packages():
-        #print(p)
+       # print(p)
 
 
 

@@ -20,6 +20,9 @@ class Package:
             self.package_id, self.address, self.city, self.state, self.zipcode, self.deadline, self.weight, self.status,
             self.delivery_time)
 
+    def get_package_id(self):
+        return self.package_id
+
     def get_deadline(self):
         return self.deadline
 
@@ -31,6 +34,9 @@ class Package:
 
     def get_address(self):
         return self.address
+
+    def set_address(self, address):
+        self.address = address
 
     def get_status(self):
         return self.status
