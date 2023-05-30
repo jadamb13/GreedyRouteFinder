@@ -8,7 +8,10 @@ def calculate_arrival_time(current_time, miles):
 
     # Create datetime time object from start time string
     time_object = datetime.strptime(current_time, '%I:%M:%S').time()
+
     # Use time_object and timedelta to create new_time object to represent delivery time
+    # datetime.combine() and timedelta() adapted from:
+    # https://bobbyhadz.com/blog/python-add-minutes-to-datetime
     new_time = (datetime.combine(date.today(), time_object) + timedelta(
         seconds=minutes_to_add * 60)).time()
 
@@ -22,3 +25,15 @@ def deliver_package(truck, package, address, time):
     package.set_delivery_time(time)
     truck.set_last_delivered_package_time(time)
     truck.set_location(address)
+
+
+def calculate_distances_between_addresses(starting_address, address_list, distances_dict):
+    address_distances = []
+
+    # For each address to check, append distance from starting_address to address
+    for address in address_list:
+        if not list(distances_dict).index(address) > len(distances_dict[starting_address]):
+            address_distances.append(distances_dict[starting_address][list(distances_dict).index(address)])
+        else:
+            address_distances.append(distances_dict[address][list(distances_dict).index(starting_address)])
+    return address_distances

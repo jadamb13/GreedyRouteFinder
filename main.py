@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, date
 
-from helper import calculate_arrival_time, deliver_package
+from helper import calculate_arrival_time, deliver_package, calculate_distances_between_addresses
 from Hash import ChainingHashTable
 from Package import *
 from Truck import *
@@ -51,32 +51,15 @@ def find_route(truck, distance_data):
         # truck.set_mileage(truck.get_mileage() + min(address_distances))
         mileage_to_first_address = address_distances[addresses_to_check.index(first_address)]
         truck.set_mileage(truck.get_mileage() + mileage_to_first_address)
-
-        # Ratio of total miles traveled in an hour to miles traveled to nearest address
-        # mileage_ratio = 18 / min(address_distances)
-        mileage_ratio = 18 / mileage_to_first_address
-        minutes_to_add = 60 / mileage_ratio
-
-        # Create datetime time object from start time string
-        time_object = datetime.strptime(start_time, '%I:%M:%S').time()
-
-        # Use time_object and timedelta to create new_time object to represent delivery time
-        # datetime.combine() and timedelta() adapted from:
-        # https://bobbyhadz.com/blog/python-add-minutes-to-datetime
-        new_time = (datetime.combine(date.today(), time_object) + timedelta(seconds=minutes_to_add * 60)).time()
-
-        # Convert new_time time object into string to store in Package attribute -> delivery_time
-        time_delivered = new_time.strftime("%I:%M:%S")
+        time_delivered = calculate_arrival_time(start_time, mileage_to_first_address)
 
         break
 
     # Find package associated with the first address and set attributes
     for i in truck.get_packages():
         # If first_address matches package address:
-        # set package status and delivery time
-        # set truck's location to first_address and set truck's last_delivery_time
         if i.get_address() == first_address:
-            # Update delivery_time, status of package, and truck's last delivery time
+            # Update delivery_time, status of package, and truck's last delivery time/location
             deliver_package(truck, i, first_address, time_delivered)
     addresses_to_check.remove(first_address)
 
@@ -84,8 +67,7 @@ def find_route(truck, distance_data):
     package_nine_address = "410 S State St"
     addresses_with_deadlines = [x.get_address() for x in truck.get_packages()
                                 if x.get_deadline() != "EOD"
-                                and x.get_status() != "Delivered"
-                                and x.get_package_id() != 9]
+                                and x.get_status() != "Delivered"]
 
     while len(addresses_with_deadlines) > 0:
         address_distances.clear()
@@ -100,19 +82,15 @@ def find_route(truck, distance_data):
         ten_twenty_time_object = datetime.strptime(ten_twenty, '%I:%M:%S').time()
 
         # Compare time to 10:20:00 and append package # 9 address if >= 10:20:00
-        if current_time_object >= ten_twenty_time_object:
-            addresses_with_deadlines.append(package_nine_address)
+        # if current_time_object >= ten_twenty_time_object:
 
         addresses_with_deadlines = [x.get_address() for x in truck.get_packages()
                                     if x.get_deadline() != "EOD"
                                     and x.get_status() != "Delivered"]
 
-        # For each address to check, append distance from starting_address to address
-        for address in addresses_with_deadlines:
-            if not list(distance_data).index(address) > len(distance_data[starting_address]):
-                address_distances.append(distance_data[starting_address][list(distance_data).index(address)])
-            else:
-                address_distances.append(distance_data[address][list(distance_data).index(starting_address)])
+        address_distances = calculate_distances_between_addresses(starting_address, addresses_with_deadlines,
+                                                                  distance_data)
+
         if len(address_distances) > 0:
 
             nearest_address = addresses_with_deadlines[address_distances.index(min(address_distances))]
@@ -124,29 +102,24 @@ def find_route(truck, distance_data):
 
             # Deliver package associated with nearest address
             for i in truck.get_packages():
-                if i.get_package_id() == 9:
-                    i.set_address(package_nine_address)
-                if i.get_address() == nearest_address:
-                    # Update truck's location and last delivery time
-                    truck.set_location(nearest_address)
-                    truck.set_last_delivered_package_time(time_delivered)
 
-                    # Update status/delivery_time of package(s) delivered
-                    i.set_status("Delivered")
-                    i.set_delivery_time(time_delivered)
+                if i.get_address() == nearest_address:
+                    if i.get_package_id() == 9 and current_time_object >= ten_twenty_time_object:
+                        i.set_address(package_nine_address)
+                        deliver_package(truck, i, nearest_address, time_delivered)
+                    # Update delivery_time, status of package, and truck's last delivery time/location
+                    else:
+                        if i.get_package_id() == 9:
+                            continue
+                        deliver_package(truck, i, nearest_address, time_delivered)
 
     # Logic for all remaining packages where package.get_status() isn't "Delivered" (until no more packages to deliver)
     while len(addresses_to_check) > 0:
         starting_address = truck.get_location()
         addresses_to_check = [x.get_address() for x in truck.get_packages() if x.get_status() != "Delivered"]
         address_distances.clear()
-
-        # For each address to check, append distance from starting_address to address
-        for address in addresses_to_check:
-            if not list(distance_data).index(address) > len(distance_data[starting_address]):
-                address_distances.append(distance_data[starting_address][list(distance_data).index(address)])
-            else:
-                address_distances.append(distance_data[address][list(distance_data).index(starting_address)])
+        address_distances = calculate_distances_between_addresses(starting_address, addresses_to_check,
+                                                                  distance_data)
 
         if len(address_distances) > 0:
 
@@ -160,13 +133,8 @@ def find_route(truck, distance_data):
             # Find package associated with nearest address
             for i in truck.get_packages():
                 if i.get_address() == nearest_address:
-                    # Update truck's location and last delivery time
-                    truck.set_location(nearest_address)
-                    truck.set_last_delivered_package_time(time_delivered)
-
-                    # Update status/delivery_time of package(s) delivered
-                    i.set_status("Delivered")
-                    i.set_delivery_time(time_delivered)
+                    # Update delivery_time, status of package, and truck's last delivery time/location
+                    deliver_package(truck, i, nearest_address, time_delivered)
 
         else:
             starting_address = truck.get_location()
@@ -199,6 +167,7 @@ def load_trucks(t1, t2, t3):
     t1.packages.append(my_hash.search(11))
     t1.packages.append(my_hash.search(4))
     t1.packages.append(my_hash.search(40))
+    t1.packages.append(my_hash.search(39))
 
     t2.packages.append(my_hash.search(3))
     t2.packages.append(my_hash.search(18))
