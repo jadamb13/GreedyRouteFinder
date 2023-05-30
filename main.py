@@ -75,14 +75,10 @@ def find_route(truck, distance_data):
 
         # Create datetime time object from start time string
         time = truck.get_last_delivered_package_time()
-        current_time_object = datetime.strptime(time, '%I:%M:%S').time()
+        current_time = datetime.strptime(time, '%I:%M:%S').time()
 
         # Create datetime time object for 10:20:00
-        ten_twenty = "10:20:00"
-        ten_twenty_time_object = datetime.strptime(ten_twenty, '%I:%M:%S').time()
-
-        # Compare time to 10:20:00 and append package # 9 address if >= 10:20:00
-        # if current_time_object >= ten_twenty_time_object:
+        ten_twenty = datetime.strptime("10:20:00", '%I:%M:%S').time()
 
         addresses_with_deadlines = [x.get_address() for x in truck.get_packages()
                                     if x.get_deadline() != "EOD"
@@ -104,7 +100,7 @@ def find_route(truck, distance_data):
             for i in truck.get_packages():
 
                 if i.get_address() == nearest_address:
-                    if i.get_package_id() == 9 and current_time_object >= ten_twenty_time_object:
+                    if i.get_package_id() == 9 and current_time >= ten_twenty:
                         i.set_address(package_nine_address)
                         deliver_package(truck, i, nearest_address, time_delivered)
                     # Update delivery_time, status of package, and truck's last delivery time/location
@@ -146,11 +142,12 @@ def find_route(truck, distance_data):
             truck.set_end_route_time(calculate_arrival_time(truck.get_last_delivered_package_time(),
                                                             distance_data[starting_address][0]))
 
+    """ [Testing]
     end_route_mileage = round((truck.get_mileage()), 2)
     print("End route mileage: " + str(end_route_mileage))
     print("Truck " + str(truck.get_truck_id()) + " end of route time: " + truck.get_end_route_time())
     print()
-
+    """
 
 def load_trucks(t1, t2, t3):
     t1.packages.append(my_hash.search(14))
@@ -220,14 +217,15 @@ if __name__ == '__main__':
     find_route(truck2, distance_data)
     find_route(truck3, distance_data)
 
-    total_mileage = truck1.get_mileage() + truck2.get_mileage() + truck3.get_mileage()
-    total_mileage_rounded = round(total_mileage, 2)
-
-    print("Total mileage: " + str(total_mileage_rounded))
-
     # print("Packages from Hashtable:")
     print()
     get_package_data()
+
+    total_mileage = truck1.get_mileage() + truck2.get_mileage() + truck3.get_mileage()
+    total_mileage_rounded = round(total_mileage, 2)
+
+    print()
+    print("Total mileage: " + str(total_mileage_rounded))
 
     # CLI or GUI logic
 
