@@ -4,7 +4,7 @@ import csv
 from Package import Package
 
 
-def calculate_arrival_time(current_time, miles):
+def calculate_trip_time(current_time, miles):
     # Ratio of total miles traveled in an hour to miles traveled to nearest address
     mileage_ratio = 18 / miles
     minutes_to_add = 60 / mileage_ratio
@@ -83,6 +83,7 @@ def load_distance_data(filename):
         for row in distance_table:
             # Turn address into single line, split into tokens, extract token for street address
             addresses.append(row[1].split('\n')[0].strip().replace('\n', ' '))
+
             for i in range(0, len(addresses) - 1):
                 distances[len(addresses) - 1].append(float(row[2 + i]))
 

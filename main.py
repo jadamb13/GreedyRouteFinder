@@ -1,6 +1,7 @@
-from datetime import datetime, timedelta, date
+from datetime import datetime
 
-from helper import calculate_arrival_time, deliver_package, calculate_distances_between_addresses, load_package_data, load_distance_data
+from helper import calculate_trip_time, deliver_package, calculate_distances_between_addresses, load_package_data, \
+    load_distance_data
 from Hash import ChainingHashTable
 from Truck import *
 
@@ -12,45 +13,36 @@ def get_package_data():
 
 
 def find_route(truck, distance_data):
-    address_distances = []
-
     # Logic for delivering first package
     while True:
 
         # Set start times and first address to visit for trucks
         if truck.get_truck_id() == 1:
+            start_time = "08:00:00"
+            first_address = "4580 S 2300 E"
             # Set package statuses after leaving hub
             for p in truck1.get_packages():
                 p.set_status("En route")
-            start_time = "08:00:00"
-            first_address = "4580 S 2300 E"
+
         if truck.get_truck_id() == 2:
-            for p in truck2.get_packages():
-                p.set_status("En route")
             start_time = "09:15:00"
             first_address = "5383 S 900 East #104"
-        if truck.get_truck_id() == 3:
-            for p in truck3.get_packages():
+            # Set package statuses after leaving hub
+            for p in truck2.get_packages():
                 p.set_status("En route")
+
+        if truck.get_truck_id() == 3:
             start_time = "10:18:00"
             first_address = "2530 S 500 E"
-
-        # Populate list with addresses for all packages on truck
-        addresses_to_check = [x.get_address() for x in truck.get_packages()]
-        for i in addresses_to_check:
-            address_distances.append(distance_data[i][0])
-
-        # Randomly select first address to start [TESTING]
-        # nearest_address = addresses_to_check[address_distances.index(min(address_distances))]
-        # random_start_index = randrange(1, len(addresses_to_check) - 1)
-        # print("Random start index: " + str(random_start_index))
-        # first_address = addresses_to_check[random_start_index]
+            # Set package statuses after leaving hub
+            for p in truck3.get_packages():
+                p.set_status("En route")
 
         # Add mileage to truck for distance to travel to nearest_address
         # truck.set_mileage(truck.get_mileage() + min(address_distances))
-        mileage_to_first_address = address_distances[addresses_to_check.index(first_address)]
-        truck.set_mileage(truck.get_mileage() + mileage_to_first_address)
-        time_delivered = calculate_arrival_time(start_time, mileage_to_first_address)
+        mileage_to_first_address = distance_data[first_address][0]
+        truck.set_mileage(mileage_to_first_address)
+        time_delivered = calculate_trip_time(start_time, mileage_to_first_address)
 
         break
 
@@ -60,10 +52,10 @@ def find_route(truck, distance_data):
         if i.get_address() == first_address:
             # Update delivery_time, status of package, and truck's last delivery time/location
             deliver_package(truck, i, first_address, time_delivered)
-    addresses_to_check.remove(first_address)
 
     # Logic for delivering packages with deadlines first
-    package_nine_address = "410 S State St"
+    address_distances = []
+    package_nine_address = "410 S State St, Salt Lake City, UT, 84111"
     addresses_with_deadlines = [x.get_address() for x in truck.get_packages()
                                 if x.get_deadline() != "EOD"
                                 and x.get_status() != "Delivered"]
@@ -93,7 +85,7 @@ def find_route(truck, distance_data):
             # Add mileage to travel to the nearest address
             truck.set_mileage(truck.get_mileage() + min(address_distances))
 
-            time_delivered = calculate_arrival_time(truck.get_last_delivered_package_time(), min(address_distances))
+            time_delivered = calculate_trip_time(truck.get_last_delivered_package_time(), min(address_distances))
 
             # Deliver package associated with nearest address
             for i in truck.get_packages():
@@ -109,6 +101,7 @@ def find_route(truck, distance_data):
                         deliver_package(truck, i, nearest_address, time_delivered)
 
     # Logic for all remaining packages where package.get_status() isn't "Delivered" (until no more packages to deliver)
+    addresses_to_check = [x.get_address() for x in truck.get_packages() if x.get_status() != "Delivered"]
     while len(addresses_to_check) > 0:
         starting_address = truck.get_location()
         addresses_to_check = [x.get_address() for x in truck.get_packages() if x.get_status() != "Delivered"]
@@ -123,7 +116,7 @@ def find_route(truck, distance_data):
             # Add mileage to travel to the nearest address
             truck.set_mileage(truck.get_mileage() + min(address_distances))
 
-            time_delivered = calculate_arrival_time(truck.get_last_delivered_package_time(), min(address_distances))
+            time_delivered = calculate_trip_time(truck.get_last_delivered_package_time(), min(address_distances))
 
             # Find package associated with nearest address
             for i in truck.get_packages():
@@ -138,8 +131,8 @@ def find_route(truck, distance_data):
             truck.set_mileage(truck.get_mileage() + distance_data[starting_address][0])
 
             # Convert new_time time object into string to store in Package attribute -> delivery_time
-            truck.set_end_route_time(calculate_arrival_time(truck.get_last_delivered_package_time(),
-                                                            distance_data[starting_address][0]))
+            truck.set_end_route_time(calculate_trip_time(truck.get_last_delivered_package_time(),
+                                                         distance_data[starting_address][0]))
 
     """ [Testing]
     end_route_mileage = round((truck.get_mileage()), 2)
