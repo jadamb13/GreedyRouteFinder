@@ -227,7 +227,6 @@ def load_trucks(t1, t2, t3):
 
 
 if __name__ == '__main__':
-    print()
 
     # Hash table instance
     my_hash = ChainingHashTable()
@@ -249,15 +248,12 @@ if __name__ == '__main__':
     find_route(truck2, distance_data)
     find_route(truck3, distance_data)
 
-    # print("Packages from Hashtable:")
-    print()
-    get_package_data()
-
+    # Calculate total mileage for all three trucks after routes are complete
     total_mileage = truck1.get_mileage() + truck2.get_mileage() + truck3.get_mileage()
     total_mileage_rounded = round(total_mileage, 2)
 
-    print()
-    print("Total mileage: " + str(total_mileage_rounded))
+    #print()
+    #print("Total mileage: " + str(total_mileage_rounded))
 
     # CLI or GUI logic
 
