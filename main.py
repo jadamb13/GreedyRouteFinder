@@ -227,7 +227,6 @@ def load_trucks(t1, t2, t3):
 
 
 if __name__ == '__main__':
-
     # Hash table instance
     my_hash = ChainingHashTable()
 
@@ -252,11 +251,23 @@ if __name__ == '__main__':
     total_mileage = truck1.get_mileage() + truck2.get_mileage() + truck3.get_mileage()
     total_mileage_rounded = round(total_mileage, 2)
 
-    #print()
-    #print("Total mileage: " + str(total_mileage_rounded))
+    # print()
+    # print("Total mileage: " + str(total_mileage_rounded))
 
-    # CLI or GUI logic
+    # CLI logic
+    print()
+    print("WGUPS Routing System")
+    print("1: Enter a time to view status of all packages")
+    print("2: View total mileage of all trucks after routes have been completed")
+    print()
+    choice = input("Please enter a number for your selection: ")
 
-    # TODO: 1. Reduce duplicated code -> move to functions
-    # TODO: 2. Separate out find_nearest_address/nearest_neighbor from find_route()
-    # TODO: 3. Decide on GUI or CLI and implement
+    if choice == str(1):
+        time = input("Please enter a time in the format mm:hh using 24 hour time (i.e. 15:00 for 3:00pm): ")
+        print(time)
+    if choice == str(2):
+        print("Truck 1 mileage: " + str(round(truck1.get_mileage(), 2)))
+        print("Truck 2 mileage: " + str(round(truck2.get_mileage(), 2)))
+        print("Truck 3 mileage: " + str(round(truck3.get_mileage(), 2)))
+        print("Total mileage: " + str(total_mileage_rounded))
+
