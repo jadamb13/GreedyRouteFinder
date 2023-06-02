@@ -95,3 +95,44 @@ def load_distance_data(filename):
         distances_dict[key] = [x for x in distances[keys.index(key)]]
 
     return distances_dict
+
+
+def get_delivery_status_at_time(packages, time, trucks):
+    # Create datetime time object from time string
+    time_object = datetime.strptime(time + ":00", '%H:%M:%S').time()
+    print(time_object)
+
+    for i in packages:
+        if i in trucks[0].get_packages():
+            start_time = '08:00:00'
+        if i in trucks[1].get_packages():
+            start_time = '09:15:00'
+        if i in trucks[2].get_packages():
+            start_time = '10:18:00'
+
+        # Create datetime time object from start_time string
+        start_time_object = datetime.strptime(start_time, '%I:%M:%S').time()
+
+        # Create datetime time object from package delivery time string
+        delivery_time_object = datetime.strptime(i.get_delivery_time(), '%I:%M:%S').time()
+
+        # If after start time, check time given against package delivery times to set package status to delivered
+        if time_object >= start_time_object:
+            # If delivery time after given time, set status to "En Route"
+            if time_object <= delivery_time_object:
+                i.set_status("En Route")
+                i.set_delivery_time("N/A")
+
+            # Else: (delivery time before or equal to given time, set status to "Delivered"
+            else:
+                i.set_status("Delivered")
+
+        # Else: (not after start time)
+        else:
+            # Set all packages to "At hub"
+            i.set_status("At hub")
+            i.set_delivery_time("N/A")
+
+    for p in packages:
+        print(p)
+

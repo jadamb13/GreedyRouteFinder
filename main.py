@@ -2,8 +2,7 @@
 
 from datetime import datetime
 
-from helper import calculate_trip_time, deliver_package, calculate_distances_between_addresses, load_package_data, \
-    load_distance_data
+from helper import *
 from Hash import ChainingHashTable
 from Truck import *
 
@@ -265,6 +264,15 @@ if __name__ == '__main__':
     if choice == str(1):
         time = input("Please enter a time in the format mm:hh using 24 hour time (i.e. 15:00 for 3:00pm): ")
         print(time)
+        packages = []
+        trucks = [truck1, truck2, truck3]
+        for i in range(0, 40):
+            packages.append(my_hash.search(i+1))
+        get_delivery_status_at_time(packages, time, trucks)
+        print(truck1.get_end_route_time())
+        print(truck2.get_end_route_time())
+        print(truck3.get_end_route_time())
+
     if choice == str(2):
         print("Truck 1 mileage: " + str(round(truck1.get_mileage(), 2)))
         print("Truck 2 mileage: " + str(round(truck2.get_mileage(), 2)))
