@@ -269,9 +269,7 @@ if __name__ == '__main__':
         for i in range(0, 40):
             packages.append(my_hash.search(i+1))
         get_delivery_status_at_time(packages, time, trucks)
-        print(truck1.get_end_route_time())
-        print(truck2.get_end_route_time())
-        print(truck3.get_end_route_time())
+
 
     if choice == str(2):
         print("Truck 1 mileage: " + str(round(truck1.get_mileage(), 2)))
