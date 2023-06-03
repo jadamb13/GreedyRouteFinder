@@ -100,7 +100,6 @@ def load_distance_data(filename):
 def get_delivery_status_at_time(packages, time, trucks):
     # Create datetime time object from time string
     time_object = datetime.strptime(time + ":00", '%H:%M:%S').time()
-    print(time_object)
 
     for i in packages:
         if i in trucks[0].get_packages():
@@ -133,6 +132,8 @@ def get_delivery_status_at_time(packages, time, trucks):
             i.set_status("At hub")
             i.set_delivery_time("N/A")
 
+    print()
+    print("Package statuses at " + time + ":")
     for p in packages:
         print(p)
 

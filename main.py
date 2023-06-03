@@ -256,22 +256,19 @@ if __name__ == '__main__':
     # CLI logic
     print()
     print("WGUPS Routing System")
+    print("0: Exit")
     print("1: Enter a time to view status of all packages")
     print("2: View total mileage of all trucks after routes have been completed")
     print()
-    choice = input("Please enter a number for your selection: ")
 
+    choice = input("Please enter a number for your selection: ")
     if choice == str(1):
         time = input("Please enter a time in the format mm:hh using 24 hour time (i.e. 15:00 for 3:00pm): ")
-        print(time)
         packages = []
         trucks = [truck1, truck2, truck3]
         for i in range(0, 40):
             packages.append(my_hash.search(i+1))
         get_delivery_status_at_time(packages, time, trucks)
-        print(truck1.get_end_route_time())
-        print(truck2.get_end_route_time())
-        print(truck3.get_end_route_time())
 
     if choice == str(2):
         print("Truck 1 mileage: " + str(round(truck1.get_mileage(), 2)))
