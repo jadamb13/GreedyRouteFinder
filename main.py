@@ -241,6 +241,7 @@ if __name__ == '__main__':
     # Load address and distance data from csv file into lists
     distance_data = load_distance_data('distances.csv')
 
+    '''
     # Find routes for trucks
     find_route(truck1, distance_data)
     find_route(truck2, distance_data)
@@ -277,3 +278,4 @@ if __name__ == '__main__':
         print("Truck 3 mileage: " + str(round(truck3.get_mileage(), 2)))
         print("Total mileage: " + str(total_mileage_rounded))
 
+'''

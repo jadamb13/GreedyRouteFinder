@@ -78,6 +78,7 @@ def load_distance_data(filename):
         row0 = next(distance_table)
         # Turn address into single line, split into tokens, extract token for street address
         addresses.append(row0[0].split('\n')[1].replace('\n', ' ').replace(',', ''))
+        distances[0].append(0.0)
 
         # For all other rows, extract address from second column
         for row in distance_table:
@@ -86,13 +87,35 @@ def load_distance_data(filename):
 
             for i in range(0, len(addresses) - 1):
                 distances[len(addresses) - 1].append(float(row[2 + i]))
-
+            distances[len(addresses) - 1].append(0.0)
     # Save addresses and distances into dictionary
     # key: address | values: list of distances to other addresses
     distances_dict = {}
     keys = [a for a in addresses]
     for key in keys:
         distances_dict[key] = [x for x in distances[keys.index(key)]]
+
+    address_dict = {}
+    for i in range(0, len(distances_dict)):
+        address_dict[i] = keys[i]
+
+    start = 1
+    values = []
+    for key in distances_dict:
+        values.append(distances_dict[address_dict[start]][0])
+        if start <= 25:
+            start += 1
+        else:
+            break
+    print(values)
+    for value in values:
+        distances_dict[address_dict[0]].append(value)
+    values.clear()
+
+    print(address_dict)
+
+    for key in distances_dict:
+        print(distances_dict[key])
 
     return distances_dict
 
@@ -135,4 +158,3 @@ def get_delivery_status_at_time(packages, time, trucks):
 
     for p in packages:
         print(p)
-
