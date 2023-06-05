@@ -88,6 +88,7 @@ def load_distance_data(filename):
             for i in range(0, len(addresses) - 1):
                 distances[len(addresses) - 1].append(float(row[2 + i]))
             distances[len(addresses) - 1].append(0.0)
+
     # Save addresses and distances into dictionary
     # key: address | values: list of distances to other addresses
     distances_dict = {}
@@ -95,24 +96,12 @@ def load_distance_data(filename):
     for key in keys:
         distances_dict[key] = [x for x in distances[keys.index(key)]]
 
+    # Save addresses in dictionary to reference by index
     address_dict = {}
     for i in range(0, len(distances_dict)):
         address_dict[i] = keys[i]
 
-    '''
-    moving_start_index = 1
-    values = []
-    for i in range(0, len(distances_dict)):
-        values.append(distances_dict[address_dict[moving_start_index]][i])
-        if moving_start_index <= 25:
-            moving_start_index += 1
-        #for value in values:
-            #distances_dict[address_dict[i]].append(value)
-        print(values)
-        values.clear()
-
-
-        '''
+    # Fully populate distances_dict to get symmetrical data
     address_index = 1
     values = []
     for i in range(27):
@@ -124,9 +113,6 @@ def load_distance_data(filename):
         address_index = 2 + i
         distances_dict[address_dict[i]] += values
         values.clear()
-
-    for key in distances_dict:
-        print(distances_dict[key])
 
     return distances_dict
 

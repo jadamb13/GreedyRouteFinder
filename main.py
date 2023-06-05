@@ -241,7 +241,7 @@ if __name__ == '__main__':
     # Load address and distance data from csv file into lists
     distance_data = load_distance_data('distances.csv')
 
-    '''
+
     # Find routes for trucks
     find_route(truck1, distance_data)
     find_route(truck2, distance_data)
@@ -257,6 +257,7 @@ if __name__ == '__main__':
     # CLI logic
     print()
     print("WGUPS Routing System")
+    print("0: Exit")
     print("1: Enter a time to view status of all packages")
     print("2: View total mileage of all trucks after routes have been completed")
     print()
@@ -264,11 +265,13 @@ if __name__ == '__main__':
 
     if choice == str(1):
         time = input("Please enter a time in the format mm:hh using 24 hour time (i.e. 15:00 for 3:00pm): ")
-        print(time)
+
         packages = []
         trucks = [truck1, truck2, truck3]
         for i in range(0, 40):
             packages.append(my_hash.search(i+1))
+        print("Package statuses at " + time + ":")
+
         get_delivery_status_at_time(packages, time, trucks)
 
 
@@ -278,4 +281,3 @@ if __name__ == '__main__':
         print("Truck 3 mileage: " + str(round(truck3.get_mileage(), 2)))
         print("Total mileage: " + str(total_mileage_rounded))
 
-'''
