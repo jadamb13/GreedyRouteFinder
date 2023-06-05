@@ -114,27 +114,16 @@ def load_distance_data(filename):
 
         '''
     address_index = 1
-    start = 1
     values = []
-
     for i in range(27):
         for row in distances_dict:
-            if address_index == 27 or start == 27:
+            if address_index == 27:
                 break
             values.append(distances_dict[address_dict[address_index]][i])
             address_index += 1
         address_index = 2 + i
-        start += 1
-        print(values)
+        distances_dict[address_dict[i]] += values
         values.clear()
-
-
-
-
-# print(values)
-
-
-    # print(address_dict)
 
     for key in distances_dict:
         print(distances_dict[key])
