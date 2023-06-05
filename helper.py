@@ -99,20 +99,46 @@ def load_distance_data(filename):
     for i in range(0, len(distances_dict)):
         address_dict[i] = keys[i]
 
+    '''
+    moving_start_index = 1
+    values = []
+    for i in range(0, len(distances_dict)):
+        values.append(distances_dict[address_dict[moving_start_index]][i])
+        if moving_start_index <= 25:
+            moving_start_index += 1
+        #for value in values:
+            #distances_dict[address_dict[i]].append(value)
+        print(values)
+        values.clear()
+
+
+        '''
+    address_index = 1
     start = 1
     values = []
-    for key in distances_dict:
-        values.append(distances_dict[address_dict[start]][0])
-        if start <= 25:
-            start += 1
-        else:
-            break
-    print(values)
-    for value in values:
-        distances_dict[address_dict[0]].append(value)
-    values.clear()
+    count = 0
+    for i in range(27):
+        print("i: " + str(i))
+        print("Start: " + str(start))
+        for row in distances_dict:
+            print("Address Index " + str(address_index))
+            if address_index == 27 or start == 27:
+                break
+            values.append(distances_dict[address_dict[address_index]][i])
+            address_index += 1
+        address_index = 1 + i
+        #count += 1
+        start += 1
+        print(values)
+        values.clear()
 
-    print(address_dict)
+
+
+
+# print(values)
+
+
+    # print(address_dict)
 
     for key in distances_dict:
         print(distances_dict[key])
