@@ -159,23 +159,12 @@ def get_delivery_status_at_time(packages, time, trucks):
 
 
 def find_nearest_address(starting_address, address_list, distance_data, indexes):
-    print()
-    print("Find nearest address function called.")
-    print()
     nearest_address = ''
     shortest_distance = 10000
-    print("Start address_list: ")
-    print(address_list)
+
     for address in address_list:
         distance = distance_data[starting_address][indexes[address]]
-        print("Distance: " + str(distance))
         if distance < shortest_distance and distance != 0.0:
             shortest_distance = distance
             nearest_address = address
-        print("Shortest distance: " + str(shortest_distance))
-    if shortest_distance == 10000:
-        print()
-        print("Starting address " + starting_address)
-        print("Address list: " + str([a for a in address_list]))
-        print()
     return [nearest_address, shortest_distance]
