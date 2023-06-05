@@ -184,7 +184,11 @@ def get_packages_with_deadlines_data(trucks):
         all_packages += truck.get_packages()
     packages_with_deadlines = [x for x in all_packages if x.get_deadline() != "EOD"]
     print()
-    print("Packages with deadlines: ")
+    print("Packages with deadlines: ".center(100))
+    print()
+    print("%-5s %-50s %-13s %-10s %-15s %s" %
+          ("ID", "Address".center(30), "Deadline",
+           "Weight", "Status".center(12), "Delivery Time".center(12)))
     for pkg in packages_with_deadlines:
         print(pkg)
     print()
