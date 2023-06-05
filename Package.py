@@ -14,7 +14,7 @@ class Package:
 
     def __str__(self):  # overwrite print(Package), otherwise it will print object reference
         address = self.address + " " + self.city + " " + self.state + " " + self.zipcode
-        return "%-5s %-50s %s %s %s %s" % (
+        return "%-5s %-50s %-15s %-5s %-15s %-10s" % (
             self.package_id, address, self.deadline, self.weight, self.status,
             self.delivery_time)
 
