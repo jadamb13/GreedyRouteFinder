@@ -123,7 +123,15 @@ def get_delivery_status_at_time(packages, time, trucks):
     # Create datetime time object from time string
     time_object = datetime.strptime(time + ":00", '%H:%M:%S').time()
 
+    # Create datetime time object for 10:20:00
+    ten_twenty = datetime.strptime("10:20:00", '%I:%M:%S').time()
+
+    # Create package_nine_address string to hold address of updated Package #9
+    package_nine_address = "410 S State St, Salt Lake City, UT, 84111"
+
     for i in packages:
+        if time_object >= ten_twenty and i.get_package_id() == 9:
+            i.set_address(package_nine_address)
         if i in trucks[0].get_packages():
             start_time = '08:00:00'
         if i in trucks[1].get_packages():
@@ -168,3 +176,15 @@ def find_nearest_address(starting_address, address_list, distance_data, indexes)
             shortest_distance = distance
             nearest_address = address
     return [nearest_address, shortest_distance]
+
+
+def get_packages_with_deadlines_data(trucks):
+    all_packages = []
+    for truck in trucks:
+        all_packages += truck.get_packages()
+    packages_with_deadlines = [x for x in all_packages if x.get_deadline() != "EOD"]
+    print()
+    print("Packages with deadlines: ")
+    for pkg in packages_with_deadlines:
+        print(pkg)
+    print()

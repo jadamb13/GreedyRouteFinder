@@ -13,8 +13,9 @@ class Package:
         self.delivery_time = "N/A"
 
     def __str__(self):  # overwrite print(Package), otherwise it will print object reference
-        return "%s, %s, %s, %s, %s, %s, %s, %s, %s" % (
-            self.package_id, self.address, self.city, self.state, self.zipcode, self.deadline, self.weight, self.status,
+        address = self.address + " " + self.city + " " + self.state + " " + self.zipcode
+        return "%-5s %-50s %s %s %s %s" % (
+            self.package_id, address, self.deadline, self.weight, self.status,
             self.delivery_time)
 
     def get_package_id(self):
