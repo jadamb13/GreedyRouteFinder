@@ -290,8 +290,15 @@ if __name__ == '__main__':
         trucks = [truck1, truck2, truck3]
         for i in range(0, 40):
             packages.append(my_hash.search(i + 1))
-        print("Package statuses at " + time + ":")
 
+        print()
+        header = "Package statuses at " + time
+        print(header.center(120))
+        print("-" * 130)
+        print("%-5s %-68s %-10s %-13s %-15s %s" %
+              ("ID", "Address".center(30), "Weight".center(6),
+               "Deadline".center(12), "Status".center(13), "Delivery Time".center(15)))
+        print("-" * 130)
         get_delivery_status_at_time(packages, time, trucks)
 
     if choice == str(2):
