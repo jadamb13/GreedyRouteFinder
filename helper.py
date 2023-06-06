@@ -30,20 +30,6 @@ def deliver_package(truck, package, address, time):
     truck.set_location(address)
 
 
-def calculate_distances_between_addresses(starting_address, address_list, distances_dict, indexes):
-    address_distances = []
-
-    for address in address_list:
-        continue
-    # For each address to check, append distance from starting_address to address
-    for address in address_list:
-        if not list(distances_dict).index(address) > len(distances_dict[starting_address]):
-            address_distances.append(distances_dict[starting_address][list(distances_dict).index(address)])
-        else:
-            address_distances.append(distances_dict[address][list(distances_dict).index(starting_address)])
-    return address_distances
-
-
 def load_package_data(filename, my_hash):
     with open(filename) as package_file:
         package_data = csv.reader(package_file, delimiter=',')
@@ -59,7 +45,6 @@ def load_package_data(filename, my_hash):
 
             # Package object
             p = Package(p_id, p_address, p_city, p_state, p_zipcode, p_deadline, p_weight)
-            # print(p)
 
             # insert it into the hash table
             my_hash.insert(p_id, p)
@@ -193,3 +178,28 @@ def get_packages_with_deadlines_data(trucks):
     for pkg in packages_with_deadlines:
         print(pkg)
     print()
+
+def send_truck_to_first_address(truck):
+    # Set start times and first address to visit for trucks
+    if truck.get_truck_id() == 1:
+        start_time = "08:00:00"
+        first_address = "4580 S 2300 E"
+        # Set package statuses after leaving hub
+        for p in truck.get_packages():
+            p.set_status("En route")
+
+    if truck.get_truck_id() == 2:
+        start_time = "09:15:00"
+        first_address = "5383 S 900 East #104"
+        # Set package statuses after leaving hub
+        for p in truck.get_packages():
+            p.set_status("En route")
+
+    if truck.get_truck_id() == 3:
+        start_time = "10:18:00"
+        first_address = "2530 S 500 E"
+        # Set package statuses after leaving hub
+        for p in truck.get_packages():
+            p.set_status("En route")
+
+    return [start_time, first_address]
