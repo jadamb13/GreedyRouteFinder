@@ -14,29 +14,29 @@ def get_package_data():
 
 
 def find_route(truck, distance_data):
-    # Logic for delivering first package
+
+
+    # Logic for delivering first package #
     while True:
         first_address_data = send_truck_to_first_address(truck)
-        start_time = first_address_data[0]
-        first_address = first_address_data[1]
+        first_address = first_address_data[0]
+        start_time = first_address_data[1]
 
         # Add mileage to truck for distance to travel to nearest_address
-        # truck.set_mileage(truck.get_mileage() + min(address_distances))
         mileage_to_first_address = distance_data[first_address][0]
         truck.set_mileage(mileage_to_first_address)
         time_delivered = calculate_trip_time(start_time, mileage_to_first_address)
-
         break
 
-    # Find package associated with the first address and set attributes
+    # Find package associated with the first address and deliver
     for p in truck.get_packages():
         # If first_address matches package address:
         if p.get_address() == first_address:
-            # Update delivery_time, status of package, and truck's last delivery time/location
-            deliver_package(truck, p, first_address, time_delivered)
+            set_attributes_on_delivery(truck, p, first_address, time_delivered)
 
-    # Logic for delivering packages with deadlines first
+    # Logic for delivering packages with deadlines first #
 
+    # Dictionary to map index values to addresses from distance table
     address_indexes = {}
     keys = distance_data.keys()
     count = 0
@@ -44,82 +44,44 @@ def find_route(truck, distance_data):
         address_indexes[j] = count
         count += 1
 
-    # Create addresses_with_deadlines list and populate it with addresses for all packages on the truck
-    # that haven’t been delivered and have a delivery_deadline other than End of Day (EOD)
+    # Create addresses_with_deadlines list and populate it with addresses of undelivered packages with deadlines
     addresses_with_deadlines = [x.get_address() for x in truck.get_packages()
                                 if x.get_deadline() != "EOD"
                                 and x.get_status() != "Delivered"]
-
-    # Set the starting time to time of the truck’s last delivered package
-    time = truck.get_last_delivered_package_time()
-
-    # Create datetime time object from start time string
-    current_time = datetime.strptime(time, '%I:%M:%S').time()
-
-    # Create datetime time object for 10:20:00
-    ten_twenty = datetime.strptime("10:20:00", '%I:%M:%S').time()
-
-
-    # Populate address_distances with distances between starting address
-    # and all addresses in addresses_with_deadlines list
-    # address_distances = calculate_distances_between_addresses(starting_address, addresses_with_deadlines,
-    #                                  distance_data, address_indexes)
 
     # If address_distances isn't empty
     while len(addresses_with_deadlines) > 0:
 
         # Set the starting address to the truck’s current location
         starting_address = truck.get_location()
-        # Create addresses_with_deadlines list and populate it with addresses for all packages on the truck
-        # that haven’t been delivered and have a delivery_deadline other than End of Day (EOD)
+
+        # List of packages that haven’t been delivered and have a delivery_deadline other than End of Day (EOD)
         addresses_with_deadlines = [x.get_address() for x in truck.get_packages()
                                     if x.get_deadline() != "EOD"
                                     and x.get_status() != "Delivered"]
+
+        # If all packages with deadlines have been delivered, exit while loop
         if len(addresses_with_deadlines) == 0:
             continue
 
+        # Find the nearest address and distance to that address | Returns: [address, distance]
         nearest_address_data = find_nearest_address(starting_address, addresses_with_deadlines,
                                                     distance_data, address_indexes)
-        nearest_address = nearest_address_data[0]
-        nearest_address_mileage = nearest_address_data[1]
+        # Deliver packages to the nearest address
+        deliver_packages(truck, nearest_address_data)
 
-        # Add mileage to travel to the nearest address
-        truck.set_mileage(truck.get_mileage() + nearest_address_mileage)
+    # Logic for delivering remaining packages #
 
-        # Calculate the trip time from the truck’s location to the nearest_address and
-        # store it into a time_delivered variable
-        time_delivered = calculate_trip_time(truck.get_last_delivered_package_time(), nearest_address_mileage)
-
-        # For all packages with an address == nearest_address
-        for k in truck.get_packages():
-
-            if k.get_address() == nearest_address:
-                # Check if the Package ID is 9 and the time is >= 10:20am
-                # If so, set Package #9 address and deliver it
-                if k.get_package_id() == 9 and current_time >= ten_twenty:
-                    deliver_package(truck, k, nearest_address, time_delivered)
-
-                else:
-                    # If the package is Package #9 but it’s not >= 10:20am
-                    if k.get_package_id() == 9:
-                        continue
-                    # If not package #9, deliver the package(s)
-                    deliver_package(truck, k, nearest_address, time_delivered)
-
-    # Logic for all remaining packages where package.get_status() isn't "Delivered"
-    # (until no more packages to deliver)
-
-    # Populate addresses_to_check list with the remaining addresses of packages on the truck
-    # that haven’t been delivered
+    # List with the remaining addresses of packages on the truck that haven’t been delivered
     addresses_to_check = [x.get_address() for x in truck.get_packages() if x.get_status() != "Delivered"]
 
+    # Until no more packages are left
     while len(addresses_to_check) > 0:
 
         # Set the starting address to the truck’s current location
         starting_address = truck.get_location()
 
-        # Populate addresses_to_check list with the remaining addresses of packages on the truck
-        # that haven’t been delivered
+        # Repopulate the addresses_to_check list after packages have been delivered each loop
         addresses_to_check = [x.get_address() for x in truck.get_packages() if x.get_status() != "Delivered"]
 
         if len(addresses_to_check) == 0:
@@ -140,21 +102,9 @@ def find_route(truck, distance_data):
             continue
         nearest_address_data = find_nearest_address(starting_address, addresses_to_check,
                                                     distance_data, address_indexes)
-        nearest_address = nearest_address_data[0]
-        nearest_address_mileage = nearest_address_data[1]
 
-        # Add mileage to travel to the nearest address
-        truck.set_mileage(truck.get_mileage() + nearest_address_mileage)
-
-        # Calculate the trip time from the truck’s location to the nearest_address
-        # and store it into a time_delivered variable
-        time_delivered = calculate_trip_time(truck.get_last_delivered_package_time(), nearest_address_mileage)
-
-        # For all packages with an address == nearest_address
-        for pkg in truck.get_packages():
-            if pkg.get_address() == nearest_address:
-                # Update delivery_time, status of package, and truck's last delivery time/location
-                deliver_package(truck, pkg, nearest_address, time_delivered)
+        # Deliver all packages with an address == nearest_address
+        deliver_packages(truck, nearest_address_data)
 
 
 def load_trucks(t1, t2, t3):

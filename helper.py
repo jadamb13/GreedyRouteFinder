@@ -23,7 +23,7 @@ def calculate_trip_time(current_time, miles):
     return time_delivered
 
 
-def deliver_package(truck, package, address, time):
+def set_attributes_on_delivery(truck, package, address, time):
     package.set_status("Delivered")
     package.set_delivery_time(time)
     truck.set_last_delivered_package_time(time)
@@ -170,14 +170,15 @@ def get_packages_with_deadlines_data(trucks):
     packages_with_deadlines = [x for x in all_packages if x.get_deadline() != "EOD"]
     print()
     print("Packages with deadlines: ".center(110))
-    print("-" * 120)
-    print("%-5s %-48s %-10s %-13s %-15s %s" %
+    print("-" * 130)
+    print("%-5s %-68s %-10s %-13s %-15s %s" %
           ("ID", "Address".center(30), "Weight".center(6),
-           "Deadline".center(12), "Status".center(15), "Delivery Time".center(17)))
-    print("-" * 120)
+           "Deadline".center(12), "Status".center(13), "Delivery Time".center(15)))
+    print("-" * 130)
     for pkg in packages_with_deadlines:
         print(pkg)
     print()
+
 
 def send_truck_to_first_address(truck):
     # Set start times and first address to visit for trucks
@@ -202,4 +203,42 @@ def send_truck_to_first_address(truck):
         for p in truck.get_packages():
             p.set_status("En route")
 
-    return [start_time, first_address]
+    return [first_address, start_time]
+
+
+def deliver_packages(truck, address_data):
+
+    address = address_data[0]
+    address_mileage = address_data[1]
+
+    # Set the starting time to time of the truck’s last delivered package
+    truck_time = truck.get_last_delivered_package_time()
+
+    # Create datetime time object from start time string
+    current_time = datetime.strptime(truck_time, '%I:%M:%S').time()
+
+    # Create datetime time object for 10:20:00
+    ten_twenty = datetime.strptime("10:20:00", '%I:%M:%S').time()
+
+    # Add mileage to travel to the nearest address
+    truck.set_mileage(truck.get_mileage() + address_mileage)
+
+    # Calculate the trip time from the truck’s location to the nearest_address
+    # and store it into a time_delivered variable
+    time_delivered = calculate_trip_time(truck_time, address_mileage)
+
+    # Find package associated with the address and deliver
+    for p in truck.get_packages():
+        # If first_address matches package address:
+        if p.get_address() == address:
+            # Check if the Package ID is 9 and the time is >= 10:20am
+            # If so, set Package #9 address and deliver it
+            if p.get_package_id() == 9 and current_time >= ten_twenty:
+                set_attributes_on_delivery(truck, p, address, time_delivered)
+
+            else:
+                # If the package is Package #9 but it’s not >= 10:20am
+                if p.get_package_id() == 9:
+                    continue
+                # If not package #9, deliver the package(s)
+                set_attributes_on_delivery(truck, p, address, time_delivered)
