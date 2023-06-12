@@ -13,8 +13,7 @@ def calculate_trip_time(current_time, miles):
     time_object = datetime.strptime(current_time, '%I:%M:%S').time()
 
     # Use time_object and timedelta to create new_time object to represent delivery time
-    # datetime.combine() and timedelta() adapted from:
-    # https://bobbyhadz.com/blog/python-add-minutes-to-datetime
+    # Reference: Hadzhiev, B. (2023)
     new_time = (datetime.combine(date.today(), time_object) + timedelta(
         seconds=minutes_to_add * 60)).time()
 
@@ -80,6 +79,7 @@ def load_distance_data(filename):
     # key: address | values: list of distances to other addresses
     distances_dict = {}
     keys = [a for a in addresses]
+    # Set distances_dict keys to addresses from CSV file
     for key in keys:
         distances_dict[key] = [x for x in distances[keys.index(key)]]
 
@@ -91,14 +91,23 @@ def load_distance_data(filename):
     # Fully populate distances_dict to get symmetrical data
     address_index = 1
     values = []
+
+    # 26 values should be in each distances list for each key/address in distances_dict
     for i in range(27):
         for row in distances_dict:
             if address_index == 27:
                 break
+            # Append column of values associated with row's address to temporary list
+            # to be added on to current row's distances
             values.append(distances_dict[address_dict[address_index]][i])
             address_index += 1
+        # Move to next row (excluding first two rows)
         address_index = 2 + i
+
+        # Append associated distances to each list in distances_dict values to make all lists equal length
         distances_dict[address_dict[i]] += values
+
+        # Clear temporary values list for next row
         values.clear()
 
     return distances_dict
@@ -152,11 +161,21 @@ def get_delivery_status_at_time(packages, time, trucks):
 
 
 def find_nearest_address(starting_address, address_list, distance_data, indexes):
+
+    # Initialize nearest address to empty string
     nearest_address = ''
+
+    # Set shortest_distance to a high number that the first distances value will be lower than
     shortest_distance = 10000
 
+    # For each address in the list
     for address in address_list:
+
+        # Get the distance from the starting address to the address
         distance = distance_data[starting_address][indexes[address]]
+
+        # If the distance is less than shortest_distance, set the address as the new nearest_address
+        # and set the distance as the new shortest_distance
         if distance < shortest_distance and distance != 0.0:
             shortest_distance = distance
             nearest_address = address
@@ -208,6 +227,8 @@ def send_truck_to_first_address(truck):
 
 def deliver_packages(truck, address_data):
 
+    # address_data is a list of length 2 holding a string address and a
+    # float mileage to the nearest address from the starting address
     address = address_data[0]
     address_mileage = address_data[1]
 

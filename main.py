@@ -1,7 +1,5 @@
 # Author: James Bennett, Student ID: 009454560
 
-from datetime import datetime
-
 from helper import *
 from Hash import ChainingHashTable
 from Truck import *
@@ -39,6 +37,7 @@ def find_route(truck, distance_data):
     address_indexes = {}
     keys = distance_data.keys()
     count = 0
+    # Set values of each address equal to a number representing their order in the distance_data dictionary
     for j in keys:
         address_indexes[j] = count
         count += 1
@@ -87,9 +86,6 @@ def find_route(truck, distance_data):
         if len(addresses_to_check) == 0:
             # Trucks 2 and 3 don't need to return to hub to meet requirements
             if truck.get_truck_id() == 1:
-                # Set the starting address to the truck’s current location
-                starting_address = truck.get_location()
-
                 # Determine the mileage back to the hub and add it to the truck’s current mileage
                 truck.set_mileage(truck.get_mileage() + distance_data[starting_address][0])
 
@@ -121,7 +117,6 @@ def load_trucks(t1, t2, t3):
     t1.packages.append(my_hash.search(21))
     t1.packages.append(my_hash.search(26))
     t1.packages.append(my_hash.search(34))
-    t1.packages.append(my_hash.search(28))
     t1.packages.append(my_hash.search(1))
     t1.packages.append(my_hash.search(11))
     t1.packages.append(my_hash.search(4))
@@ -137,7 +132,6 @@ def load_trucks(t1, t2, t3):
     t2.packages.append(my_hash.search(32))
     t2.packages.append(my_hash.search(6))
     t2.packages.append(my_hash.search(5))
-    t2.packages.append(my_hash.search(9))
     t2.packages.append(my_hash.search(8))
     t2.packages.append(my_hash.search(30))
     t2.packages.append(my_hash.search(12))
@@ -154,7 +148,8 @@ def load_trucks(t1, t2, t3):
     t3.packages.append(my_hash.search(7))
     t3.packages.append(my_hash.search(23))
     t3.packages.append(my_hash.search(22))
-
+    t3.packages.append(my_hash.search(28))
+    t3.packages.append(my_hash.search(9))
 
 if __name__ == '__main__':
     # Hash table instance
@@ -188,7 +183,6 @@ if __name__ == '__main__':
     print("2: View total mileage of all trucks after routes have been completed")
     print("3: View delivery report for packages with delivery deadlines")
     print()
-    choice = ''
 
     choice = input("Please enter a number for your selection: ")
 
