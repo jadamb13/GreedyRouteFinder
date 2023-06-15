@@ -33,14 +33,14 @@ def load_package_data(filename, my_hash):
     with open(filename) as package_file:
         package_data = csv.reader(package_file, delimiter=',')
 
-        for package in package_data:
-            p_id = int(package[0])
-            p_address = package[1]
-            p_city = package[2]
-            p_state = package[3]
-            p_zipcode = package[4]
-            p_deadline = package[5]
-            p_weight = package[6]
+        for row in package_data:
+            p_id = int(row[0])
+            p_address = row[1]
+            p_city = row[2]
+            p_state = row[3]
+            p_zipcode = row[4]
+            p_deadline = row[5]
+            p_weight = row[6]
 
             # Package object
             p = Package(p_id, p_address, p_city, p_state, p_zipcode, p_deadline, p_weight)
@@ -113,6 +113,55 @@ def load_distance_data(filename):
     return distances_dict
 
 
+def get_single_package_status_at_time(my_hash, trucks, time, package_id):
+    package = my_hash.search(int(package_id))
+
+    # Create datetime time object from time string
+    time_object = datetime.strptime(time + ":00", '%H:%M:%S').time()
+
+    # Create datetime time object for 10:20:00
+    ten_twenty = datetime.strptime("10:20:00", '%I:%M:%S').time()
+
+    # Create package_nine_address string to hold address of updated Package #9
+    package_nine_address = "410 S State St, Salt Lake City, UT, 84111"
+
+    start_time = None
+
+    if time_object >= ten_twenty and package.get_package_id() == 9:
+        package.set_address(package_nine_address)
+    if package in trucks[0].get_packages():
+        start_time = '08:00:00'
+    if package in trucks[1].get_packages():
+        start_time = '09:15:00'
+    if package in trucks[2].get_packages():
+        start_time = '10:18:00'
+
+    # Create datetime time object from start_time string
+    start_time_object = datetime.strptime(start_time, '%I:%M:%S').time()
+
+    # Create datetime time object from package delivery time string
+    delivery_time_object = datetime.strptime(package.get_delivery_time(), '%I:%M:%S').time()
+
+    # If after start time, check time given against package delivery times to set package status to delivered
+    if time_object >= start_time_object:
+        # If delivery time after given time, set status to "En Route"
+        if time_object <= delivery_time_object:
+            package.set_status("En Route")
+            package.set_delivery_time("N/A")
+
+        # Else: (delivery time before or equal to given time, set status to "Delivered"
+        else:
+            package.set_status("Delivered")
+
+    # Else: (not after start time)
+    else:
+        # Set all packages to "At hub"
+        package.set_status("At hub")
+        package.set_delivery_time("N/A")
+
+    print(package)
+
+
 def get_delivery_status_at_time(packages, time, trucks):
     # Create datetime time object from time string
     time_object = datetime.strptime(time + ":00", '%H:%M:%S').time()
@@ -122,6 +171,8 @@ def get_delivery_status_at_time(packages, time, trucks):
 
     # Create package_nine_address string to hold address of updated Package #9
     package_nine_address = "410 S State St, Salt Lake City, UT, 84111"
+
+    start_time = None
 
     for i in packages:
         if time_object >= ten_twenty and i.get_package_id() == 9:
@@ -161,7 +212,6 @@ def get_delivery_status_at_time(packages, time, trucks):
 
 
 def find_nearest_address(starting_address, address_list, distance_data, indexes):
-
     # Initialize nearest address to empty string
     nearest_address = ''
 
@@ -226,7 +276,6 @@ def send_truck_to_first_address(truck):
 
 
 def deliver_packages(truck, address_data):
-
     # address_data is a list of length 2 holding a string address and a
     # float mileage to the nearest address from the starting address
     address = address_data[0]

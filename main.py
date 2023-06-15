@@ -180,8 +180,9 @@ if __name__ == '__main__':
     print()
     print("WGUPS Routing System")
     print("1: Enter a time to view status of all packages")
-    print("2: View total mileage of all trucks after routes have been completed")
-    print("3: View delivery report for packages with delivery deadlines")
+    print("2: Enter a package ID and time to view status of an individual package")
+    print("3: View total mileage of all trucks after routes have been completed")
+    print("4: View delivery report for packages with delivery deadlines")
     print()
 
     choice = input("Please enter a number for your selection: ")
@@ -205,10 +206,24 @@ if __name__ == '__main__':
         get_delivery_status_at_time(packages, time, trucks)
 
     if choice == str(2):
+        trucks = [truck1, truck2, truck3]
+        package_id = input("Please enter a package ID: ")
+        time = input("Please enter a time in the format mm:hh using 24 hours time (i.e. 15:00 for 3:00pm): ")
+        print()
+        header = "Package " + str(package_id) + " status at " + time + ":"
+        print(header.center(120))
+        print("-" * 130)
+        print("%-5s %-68s %-10s %-13s %-15s %s" %
+              ("ID", "Address".center(30), "Weight".center(6),
+               "Deadline".center(12), "Status".center(13), "Delivery Time".center(15)))
+        print("-" * 130)
+        get_single_package_status_at_time(my_hash, trucks, time, package_id)
+
+    if choice == str(3):
         print("Truck 1 mileage: " + str(round(truck1.get_mileage(), 2)))
         print("Truck 2 mileage: " + str(round(truck2.get_mileage(), 2)))
         print("Truck 3 mileage: " + str(round(truck3.get_mileage(), 2)))
         print("Total mileage: " + str(total_mileage_rounded))
 
-    if choice == str(3):
+    if choice == str(4):
         get_packages_with_deadlines_data([truck1, truck2, truck3])
