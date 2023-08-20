@@ -1,5 +1,3 @@
-# Author: James Bennett, Student ID: 009454560
-
 from helper import *
 from Hash import ChainingHashTable
 from Truck import *
